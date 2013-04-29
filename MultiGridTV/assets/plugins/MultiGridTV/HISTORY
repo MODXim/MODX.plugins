@@ -1,0 +1,8 @@
+1.0   - First Release
+
+1.1.x - Add: Assign the same grid configuration to multiple tvids 
+      - Add: docid parameter for the snippet to use the snippet in ditto calls   
+      - Add: iteration placeholder in rowTpl
+      - Bugs: several bugfixes
+      
+1.2   - Add: different configurations for different template variable groups

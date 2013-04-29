@@ -1,0 +1,144 @@
+================================================================================
+MultiGridTV plugin
+================================================================================
+Transform template variables into a table/grid
+for the MODX Evolution content management framework
+
+================================================================================
+Features:
+================================================================================
+  * With this plugin, one or more MODX template variables can be transformed
+    into a small table/grid. 
+  * The number of columns and the column headers can be set in the plugin
+    configuration.
+  * The number of rows can be modified during editing the MODX document.
+  * The table/grid is sortable.
+  * The configuration of the template variable transformations can be done 
+    in the MODX plugin configuration or in configuration files.
+
+================================================================================
+Installation:
+================================================================================
+Upload the 'multigrid' folder to 'assets/plugins' and create a plugin with the
+following code
+
+  include(MODX_BASE_PATH.'assets/plugins/multigrid/MultiGrid.plugin.php');
+
+and check the event 'OnDocFormRender'.
+
+================================================================================
+Configuration:
+================================================================================
+The plugin configuration has to be set with the following lines:
+
+&configs=Use Config Files:;list;yes,no;no &tvids=TV IDs:;text;1 
+&tpl=Template IDs:;text; &roles=Roles:;text; 
+&columnNames=Column Names:;text;key,value
+
+'Use Config Files'  if set to yes the folder 'configs' will be searched for
+                    *.config.inc.php files which are processed as different
+                    settings for groups of template variables. This is the 
+                    only way to set DIFFERENT settings for DIFFERENT groups 
+                    of template variables. 
+'TV IDs'            is the id (or several comma separated ids) of a textarea
+                    template variable, which will be transformed into a grid.
+                    If several comma separated ids are used, the following
+                    settings are used for EVERY template variable referenced.
+'Template IDs'      is the id (or several comma separated ids) of a template 
+                    the plugin is executed in.
+'Role'              is the id (or several comma separated ids) of a manager 
+                    user who can use the plugin.
+'Column Names'      contains the comma separated column names of the generated
+                    table/grid.
+                    
+================================================================================
+Example configuration:
+================================================================================
+
+If you want to have
+
+  * 3 GridTVs for the TVs 'DataTable', 'Options' and 'People' with the ids
+    5,6 / 8 and 15
+  * Usable in the templates with the ids 4 and 6
+  * Accessable for editors (role 2) and administrators (role 1) only
+  * With column names 'Column 1', 'Column 2', 'Column 3' and 'Column 4' for the 
+    first table, 'key' and 'value' for the second and 'id', 'first name' and 
+    'last name' for the third table,
+
+you have to write three configuration files (the first part of the filename
+is not essential - you can name it i.e. by the name of the template varianble),
+
+DataTable.config.inc.php 
+<?php
+$settings['tvids']       = '5,6'; // 'TV IDs'
+$settings['tplids']      = '4,6'; // 'Template IDs'
+$settings['roles']       = '1,2'; // 'Role'
+$settings['columnNames'] = 'Column 1,Column 2,Column 3,Column 4'; // 'Column Names'
+?>
+
+Options.config.inc.php 
+<?php
+$settings['tvids']       = '8';
+$settings['tplids']      = '4,6';
+$settings['roles']       = '1,2';
+// $settings['columnNames'] = 'key,value'; // not nessesary (same as default)
+?>
+
+People.config.inc.php 
+<?php
+$settings['tvids']       = '15';
+$settings['tplids']      = '4,6';
+$settings['roles']       = '1,2';
+$settings['columnNames'] = 'id,first name,last name';
+?>
+
+place them in the 'configs' folder and/or overwrite and rename the 
+*.config.demo.inc.php files in the folder and enable 'Use Config Files'
+
+The only important line in this files is 
+$settings['tvids']       = 'x';
+The other lines will be set to defaults if they are not there.
+
+For one GridTV you could use the plugin configuration.
+
+================================================================================
+Snippet:
+================================================================================
+To display these template variable, you have to create the snippet 'MultiGrid' 
+with the code
+
+return include(MODX_BASE_PATH.'assets/plugins/multigrid/MultiGrid.snippet.php');
+
+and use snippet calls like these:
+
+[!MultiGrid?
+&tvName=`DataTable`
+&outerTpl=`@CODE <ul>[.wrapper.]</ul>`
+&rowTpl=`@CODE <li>[.Column 1.], [.Column 2.], [.Column 3.], [.Column 4.]</li>`
+&config=`DataTable`
+!]
+
+[!MultiGrid? &tvName=`Options`!]
+
+[!MultiGrid?
+&tvName=`DataTable`
+&columnNames=`id,firstName,lastName`
+&rowTpl=`@CODE:<option value="[.id.] [.firstName.] [.lastName.]">[.firstName.] [.lastName.]</option>`
+!]
+
+For the parameters &outerTpl and &rowTpl there are three different ways to use:
+ 1. Chunkname
+ 3. @FILE (or @FILE:) /path/to/filename
+ 2. @CODE (or @CODE:) string with any HTML code and masked placeholders
+    The placeholders have to be masked by [. and .] (same as in eForm)
+
+================================================================================
+Other notes:
+================================================================================
+The JSON string the grid is converted to starts with [[ and ends with ]] so the 
+MODX parser thinks it contains a snippet and you can't place the template 
+variable directly in the template.
+
+It would be overkill to use the snippet to check wether the variable is empty or 
+filled in PHx expressions, so the package contains two PHx modifiers 
+to test wether the variable is empty or filled.

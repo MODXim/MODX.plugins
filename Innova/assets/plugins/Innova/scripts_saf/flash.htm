@@ -1,0 +1,289 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/flash.js'></scr"+"ipt>");
+</script>
+<script language="JavaScript" src="color_picker.js"></script>
+<script>writeTitle()</script>
+<script>
+
+//parameter for popup window, since standard window.open doesn't support parameter
+var dialogArgument = ['parent', 'parent'];
+
+document.onclick=hideAll;
+function hideAll()
+    {
+    oColor1.hide();
+    }
+
+function GetElement(oElement,sMatchTag)
+    {
+    while (oElement!=null&&oElement.tagName!=sMatchTag)
+        {
+        if(oElement.tagName=="BODY")return null;
+        oElement=oElement.parentNode;
+        }
+    return oElement;
+    }
+
+function doWindowFocus()
+    {
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+    }
+
+function bodyOnLoad()
+    {
+    loadTxt();
+
+    window.onfocus=doWindowFocus;
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+
+    if(parent.oUtil.obj.cmdAssetManager!="")
+        document.getElementById("btnAsset").style.display="block";
+    if(parent.oUtil.obj.cmdFlashManager!="")
+        document.getElementById("btnAsset").style.display="block";
+
+    realTime()
+    }
+
+function bodyOnUnload() {
+  parent.oUtil.onSelectionChanged=null;
+}
+
+function openAsset()
+    {
+    if(parent.oUtil.obj.cmdAssetManager!="")
+    eval(parent.oUtil.obj.cmdAssetManager);
+  if(parent.oUtil.obj.cmdFlashManager!="")
+    eval(parent.oUtil.obj.cmdFlashManager);
+    }
+
+function setAssetValue(v)
+    {
+    document.getElementById("inpSwfURL").value = v;
+    }
+
+function modalDialogShow(url,width,height)
+    {
+    parent.modalDialogShow(url,width,height, window);
+    }
+
+function realTime()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+
+    clearAllProperties()
+
+    var oEl = parent.getSelectedElement(oSel);
+    oEl = GetElement(oEl, "OBJECT")
+
+    if(oEl)
+        {
+    var inpSwfURL=document.getElementById("inpSwfURL");
+    var inpSwfWidth=document.getElementById("inpSwfWidth");
+    var inpSwfHeight=document.getElementById("inpSwfHeight");
+    var rdoSwfLoop=document.getElementsByName("rdoSwfLoop");
+    var inpSwfQuality=document.getElementById("inpSwfQuality");
+    var idSelBackColor=document.getElementById("idSelBackColor");
+    var inpSwfAlign=document.getElementById("inpSwfAlign");
+
+    for(var i=0;i<oEl.childNodes.length;i++)
+      {
+      if(oEl.childNodes[i].tagName=="EMBED")
+        {
+        var oFlash=oEl.childNodes[i];
+        inpSwfURL.value=oFlash.src;
+        inpSwfWidth.value=oFlash.width;
+        inpSwfHeight.value=oFlash.height;
+        if(oFlash.getAttribute("loop")=="true")rdoSwfLoop[0].checked=true;
+        else rdoSwfLoop[1].checked=true;
+        inpSwfQuality.value=oFlash.getAttribute("quality");
+        idSelBackColor.style.background=oFlash.getAttribute("bgColor");
+        inpSwfAlign.value=oFlash.getAttribute("align");
+        }
+      }
+    }
+    }
+
+function clearAllProperties()
+    {
+  document.getElementById("inpSwfURL").value="";
+  document.getElementById("inpSwfWidth").value=100;
+  document.getElementById("inpSwfHeight").value=100;
+  document.getElementsByName("rdoSwfLoop")[0].checked=true;
+  document.getElementById("inpSwfQuality").value="high";
+  document.getElementById("idSelBackColor").style.background="";
+  document.getElementById("inpSwfAlign").value="";
+    }
+
+function doApply()
+    {
+    if(document.getElementsByName("rdoSwfLoop")[0].checked)
+        sSwfLoop="true";
+    else
+        sSwfLoop="false";
+
+    var sHTML = "<object "+
+        "classid=\""+document.getElementById("inpSwfClassID").value+"\" " +
+        "width=\""+document.getElementById("inpSwfWidth").value+"\" "+
+        "height=\""+document.getElementById("inpSwfHeight").value+"\" " +
+        "codebase=\""+document.getElementById("inpSwfCodeBase").value+"\">"+
+        "   <param name=movie value=\""+document.getElementById("inpSwfURL").value+"\">" +
+        "   <param name=play value=\"true\">" +
+        "   <param name=loop value=\""+sSwfLoop+"\">" +
+        " <param name=WMode value=\"Opaque\">" +
+        "   <param name=quality value=\""+document.getElementById("inpSwfQuality").value+"\">" +
+        "   <param name=bgcolor value=\""+document.getElementById("idSelBackColor").style.backgroundColor+"\">" +
+        "   <param name=align value=\""+document.getElementById("inpSwfAlign").value+"\">" +
+        "   <embed src=\""+document.getElementById("inpSwfURL").value+"\" " +
+        "       width=\""+document.getElementById("inpSwfWidth").value+"\" " +
+        "       height=\""+document.getElementById("inpSwfHeight").value+"\" " +
+        "       play=\"true\" " +
+        "       loop=\""+sSwfLoop+"\" " +
+        "   wmode=\"Opaque\" " +
+        "       quality=\""+document.getElementById("inpSwfQuality").value+"\" " +
+        "       bgcolor=\""+document.getElementById("idSelBackColor").style.backgroundColor+"\" " +
+        "       align=\""+document.getElementById("inpSwfAlign").value+"\" " +
+        "       pluginspage=\""+document.getElementById("inpSwfPluginsPage").value+"\">" +
+        "   </embed>"+
+        "</object>";
+
+    parent.oUtil.obj.saveForUndo();
+
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+    var oEl = parent.getSelectedElement(oSel);
+    oEl = GetElement(oEl, "OBJECT")
+    if(oEl)oEl.parentNode.removeChild(oEl);
+
+    var obj=parent.oUtil.obj;
+    obj.insertHTML(sHTML);
+    window.focus();
+
+    parent.realTime(parent.oUtil.obj);
+    parent.oUtil.obj.selectElement(0);
+    }
+</script>
+</head>
+<body style="overflow:hidden;">
+
+<table width=100% height=100% align=center cellpadding=0 cellspacing=0>
+<tr>
+<td valign=top style="padding:5px;height:100%">
+
+    <table cellpadding=2 cellspacing=0>
+    <tr>
+        <td nowrap width="90px"><span id="txtLang" name="txtLang">Source</span>:&nbsp;&nbsp;</td>
+        <td colspan="4" width="100%">
+            <table cellpadding="0" cellspacing="0" width="100%" id="Table2">
+            <tr>
+            <td width="100%"><input type="text" name=inpSwfURL id=inpSwfURL style="width:100%" value="" class="inpTxt"></td>
+            <td><input type="button" value="" onclick="openAsset()" id="btnAsset" name="btnAsset" style="display:none;background:url('openAsset.gif');width:20px;height:16px;border:#a5acb2 1px solid;margin-left:1px;"></td>
+            </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td nowrap><span id="txtLang" name="txtLang">Background</span>:&nbsp;&nbsp;</td>
+        <td nowrap colspan=4>
+            <span><span id="idSelBackColor" style="border:gray 1px solid;width:20px;margin-right:3px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
+            <input type=button name=btnPick id=btnPick value="Pick" onclick="oColor1.show(this);event.cancelBubble=true;"  />
+
+            <script>
+            var oColor1 = new ColorPicker("oColor1");
+            oColor1.onPickColor = new Function("document.getElementById('idSelBackColor').style.backgroundColor=oColor1.color;");
+            oColor1.onRemoveColor = new Function("document.getElementById('idSelBackColor').style.backgroundColor='';");
+            oColor1.align="left";
+            oColor1.onShow = new Function("document.getElementById('tbl1').style.width='23px';document.getElementById('tbl2').style.width='23px'");
+            oColor1.onHide = new Function("document.getElementById('tbl1').style.width='100px';document.getElementById('tbl2').style.width='100px'");
+            oColor1.txtCustomColors=parent.getTxt("Custom Colors");
+            oColor1.txtMoreColors=parent.getTxt("More Colors...");
+            oColor1.url = parent.oUtil.obj.scriptPath + "color_picker.htm";
+            oColor1.RENDER();
+            </script>
+        </td>
+    </tr>
+    <tr>
+        <td nowrap><span id="txtLang" name="txtLang">Width</span>:</td>
+        <td colspan=4><input type="text" name="inpSwfWidth" id="inpSwfWidth" value=100 size=4 class="inpTxt"></td>
+    </tr>
+    <tr>
+        <td nowrap><span id="txtLang" name="txtLang">Height</span>:</td>
+        <td colspan=4><input type="text" name="inpSwfHeight" id="inpSwfHeight" value=100 size=4 class="inpTxt"></td>
+    </tr>
+
+    <tr>
+        <td nowrap><span id="txtLang" name="txtLang">Quality</span>:&nbsp;&nbsp;</td>
+        <td colspan=4>
+        <table cellpadding=0 cellspacing=0 id=tbl1 style="table-layout:fixed;width:100px" ID="Table1"><tr><td>
+        <select name="inpSwfQuality" id="inpSwfQuality" class="inpSel">
+            <option id="optLang" name="optLang" value="low">Low</option>
+            <option id="optLang" name="optLang" value="high" selected>High</option>
+        </select>
+        </td></tr></table>
+        </td>
+    </tr>
+    <tr>
+        <td nowrap width="10%"><span id="txtLang" name="txtLang">Align</span>:</td>
+        <td colspan=4>
+        <table cellpadding=0 cellspacing=0 id=tbl2 style="table-layout:fixed;width:100px"><tr><td>
+        <select name="inpSwfAlign" id="inpSwfAlign" class="inpSel">
+            <option id="optLang" name="optLang" value="" selected>&lt;Not Set&gt;</option>
+            <option id="optLang" name="optLang" value="L">Left</option>
+            <option id="optLang" name="optLang" value="R">Right</option>
+            <option id="optLang" name="optLang" value="T">Top</option>
+            <option id="optLang" name="optLang" value="B">Bottom</option>
+        </select>
+        </td></tr></table>
+        </td>
+    </tr>
+    <tr>
+        <td nowrap><span id="txtLang" name="txtLang">Loop</span>:&nbsp;&nbsp;</td>
+        <td nowrap colspan=4>
+        <input type="radio" value="Radio1" name="rdoSwfLoop" class="inpRdo" checked> <span id="txtLang" name="txtLang">Yes</span>&nbsp;
+        <input type="radio" value="Radio1" name="rdoSwfLoop" class="inpRdo"> <span id="txtLang" name="txtLang">No</span>
+        </td>
+    </tr>
+    </table>
+
+    <!-- hidden -->
+    <table style="display:none" id="tblAdvance" cellpadding=2 cellspacing=0>
+    <tr>
+        <td nowrap><span id="txtLang" name="txtLang">Class ID</span>:</td>
+        <td><input type="text" name=inpSwfClassID id=inpSwfClassID size=50 value="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" class="inpTxt"></td>
+    </tr>
+    <tr style="display:none">
+        <td nowrap><span id="txtLang" name="txtLang">CodeBase</span>:</td>
+        <td><input type="text" name=inpSwfCodeBase id=inpSwfCodeBase size=50 value="http://active.macromedia.com/flash6/cabs/swflash.cab#version=6.0.0.0" class="inpTxt"></td>
+    </tr>
+    <tr style="display:none">
+        <td nowrap><span id="txtLang" name="txtLang">PluginsPage</span>:</td>
+        <td><input type="text" name=inpSwfPluginsPage id=inpSwfPluginsPage size=50 value="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash" class="inpTxt"></td>
+    </tr>
+    </table>
+    <!-- /hidden -->
+
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" align="right">
+  <table cellpadding=0 cellspacing=0>
+  <tr>
+  <td>
+    <input type="button" name=btnCancel id=btnCancel value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+    <input type="button" name=btnOk id=btnOk value=" ok " onclick="doApply();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  </tr>
+  </table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

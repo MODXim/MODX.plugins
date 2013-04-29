@@ -1,0 +1,121 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/paste_word.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+function doCmd(sCmd,sOption)
+    {
+    var idSource = document.getElementById("idSource").contentWindow;
+    idSource.document.execCommand(sCmd, false, sOption);
+    }
+
+function bodyOnLoad()
+    {
+
+    loadTxt();
+
+    var idSource = document.getElementById("idSource").contentWindow;
+    var sourceDocBody = idSource.document.body;
+    sourceDocBody.innerHTML = "";
+    sourceDocBody.style.cssText="overflow-x:scroll;overflow-y:scroll;white-space:nowrap;background-color:#ffffff";
+    sourceDocBody.clearAttributes;
+
+    idSource.document.designMode="on";
+    idSource.focus();
+    }
+
+function doInsert()
+    {
+    var obj = parent.oUtil.obj;
+
+    var sHTML=fixWord();
+
+    obj.insertHTML(sHTML);
+
+    obj.cleanDeprecated();
+    }
+
+function fixWord()
+    {
+    for (var i=0;i<idSource.document.body.getElementsByTagName("*").length;i++)
+        {
+    idSource.document.body.getElementsByTagName("*")[i].removeAttribute("class");
+    idSource.document.body.getElementsByTagName("*")[i].removeAttribute("style");
+        }
+    var str=idSource.document.body.innerHTML;
+    str = str.replace(/<!(?:--[\s\S]*?--\s*)?>\s*/gi, "");
+
+    str=String(str).replace(/<\\?\?xml[^>]*>/g,"");
+    str=String(str).replace(/<\/?o:p[^>]*>/g,"");
+    str=String(str).replace(/<\/?u1:p[^>]*>/gi,"");
+    str=String(str).replace(/<\/?v:[^>]*>/g,"");
+    str=String(str).replace(/<\/?o:[^>]*>/g,"");
+    str=String(str).replace(/<\/?st1:[^>]*>/g,"");
+    str=String(str).replace(/<\/?w:wrap[^>]*>/gi,"");
+    str=String(str).replace(/<\/?w:anchorlock[^>]*>/gi,"");
+
+    str=String(str).replace(/&nbsp;/g,"");//<p>&nbsp;</p>
+
+    str=String(str).replace(/<\/?SPAN[^>]*>/g,"");
+    str=String(str).replace(/<\/?FONT[^>]*>/g,"");
+    str=String(str).replace(/<\/?STRONG[^>]*>/g,"");
+
+    str=String(str).replace(/<\/?H1[^>]*>/g,"");
+    str=String(str).replace(/<\/?H2[^>]*>/g,"");
+    str=String(str).replace(/<\/?H3[^>]*>/g,"");
+    str=String(str).replace(/<\/?H4[^>]*>/g,"");
+    str=String(str).replace(/<\/?H5[^>]*>/g,"");
+    str=String(str).replace(/<\/?H6[^>]*>/g,"");
+
+    str=String(str).replace(/<\/?P[^>]*><\/P>/g,"");
+
+    str=String(str).replace(/<!--\[if[^>]*>/gi, "");
+    str=String(str).replace(/<!--\[endif\]-->/gi, "");
+    str=String(str).replace(/<!\[endif\]-->/gi, "");
+
+    str=String(str).replace(/<\/?meta[^>]*>/g,"");
+    str=String(str).replace(/<\/?link[^>]*>/g,"");
+
+    str=String(str).replace(/<\/?style[^>]*>/g,"");
+
+
+    return str;
+    }
+</script>
+</head>
+<body style="overflow:hidden;margin:0;">
+
+<table width="100%" height="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td nowrap style="padding:5px">&nbsp;<span id=txtLang name=txtLang>Paste Word content here</span>:
+</td>
+</tr>
+<tr>
+<tr>
+<td style="height:100%;" >
+    <iframe style="width:100%;height:100%;" frameborder="no" name="idSource" id="idSource"></iframe>
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" align="right" style="padding-top:10px;">
+  <table cellpadding=0 cellspacing=0>
+  <tr>
+  <td>
+    <input type="button" name=btnCancel id=btnCancel value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+    <input type="button" name=btnOk id=btnOk value=" ok " onclick="doInsert();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  </tr>
+  </table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

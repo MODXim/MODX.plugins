@@ -1,0 +1,37 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/preview.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+function bodyOnLoad()
+    {
+    loadTxt();
+    var sHTML=parent.oUtil.obj.getHTML();
+    var frmPreview = document.getElementById("idPreview").contentWindow;
+    frmPreview.document.open("text/html", "replace");
+    frmPreview.document.write(sHTML);
+    frmPreview.document.close();
+    }
+</script>
+</head>
+<body style="overflow:hidden;">
+
+<table width="100%" height="100%" bgcolor=#ffffff align="center" cellpadding="0" cellspacing="0">
+<td style="height:100%">
+    <iframe style="width:100%;height:100%;overflow:auto;border:0px" name="idPreview" id="idPreview"></iframe>
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" style="padding-top:10px;" align="right">
+    <input type="button" id="btnClose" name="btnClose" value="close" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+</td>
+</tr>
+</table>
+
+</body>
+</html>

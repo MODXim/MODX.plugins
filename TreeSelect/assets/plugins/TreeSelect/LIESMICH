@@ -1,0 +1,164 @@
+================================================================================
+TreeSelectTV Plugin 0.2.1
+================================================================================
+für das MODx Evolution content management framework
+
+================================================================================
+Beschreibung:
+================================================================================
+
+Dieses Plugin kann dazu benutzt werden, einen Verzeichnisbaum im Manager-Backend 
+von MODX Evolution darzustellen und dessen Verzeichnisse und/oder Dateien
+auswählbar zu machen. Das Ausgewählte Verzeichnis bzw. die Datei wird dann in
+das Textfeld einer Template Variablen (TV) als Pfad übergeben.
+
+Die Konfiguration Erfolgt im Manager-Backend.
+Wie aus der Konfigurationsdatei "configs/default.config.inc.php" ersichtlich,
+gibt es viele Optionen für die Anpassung. Das Aussehen kann über die CSS-Datei
+"TreeSelect.styles.css" und die/den Konfigurationsdatei/en eingestellt werden.
+
+
+Wichtig bei Upgrades von Version 0.1.*:
+    Die Konfigurationsdateien sind nicht kompatibel und müssen angepasst werden.
+
+================================================================================
+Installation:
+================================================================================
+
+1.  Archiv herunterladen und lokal entpacken.
+
+
+2.  Neuen Ordner "assets/plugins/TreeSelect" im MODx-Installationsverzeichnis
+    erstellen und diese Dateien hineinkopieren:
+
+        TreeSelect.class.php
+        TreeSelect.core.php
+        TreeSelect.class.js
+        TreeSelect.styles.css
+        PluginConfig.class.php
+        configs/default.config.inc.php
+
+    (Alternativ kann eine anderer Verzeichnisname und im "pluginPath"-Feld der
+    Plugin-Konfiguration angepasst werden.)
+
+
+3.  Plugin-Einstellungen:
+
+    Neues Plugin im MODX Manager-Backend anlegen:
+
+    a.  Im Tab "Allgemein"
+        folgende Werte eintagen:
+
+            "Plugin-Name":  TreeSelect
+            "Beschreibung": <strong>0.2.1</strong> TreeSelectTV plugin 
+
+        Die Datei
+
+            plugin.TreeSelect.php
+
+        in einem Texteditor öffnen und den Inhalt der Datei in den Bereich
+        "Plugin-Code" des neuen Plugins kopieren.
+
+    b.  Im Tab "Konfiguration"
+        als Plugin-Konfiguration diese Zeile eintragen:
+
+            &pluginPath=Plugin path;string;assets/plugins/TreeSelect/ &tvids=TV IDs;string; &tplids=Template IDs;string; &roles=Roles;string; &input_status=Inputfield status;list;hide,show,toggle;hide &list_separator=Separator;string;/ &list_depth=Tree depth;int;-1 &list_sortBy=Sort by;list;unsorted,name,size;name &list_sortDirection=Sort direction;list;lower -> upper,upper -> lower;lower -> upper &list_sortFirst=Sort first;list;not set,folders,files;folders &list_hideOnSelect=Hide on select;list;yes,no;no &list_image_view=Image preview;list;yes,no;yes &list_path_base=Path base;list;Start folder,Website base,Server root;Start folder &list_folders_base=Base folder (leave empty for MODX base path);string; &list_folders_start=Start folder;string; &list_folders_filter=Folders to ignore (reg. expr.);string;^\.+ &list_folders_accept=Folders to accept (reg. expr.);string;.* &list_folders_showSize=Show folder sizes;list;yes,no;yes &list_folders_only=Folders only;list;yes,no;no &list_files_filter=Files to ignore;string;^\.+ &list_files_accept=Files to accept;string;.* &list_files_showSize=Show file sizes;list;yes,no;yes &list_files_skip_0b=Skip empty files;list;yes,no;no &list_files_maxsize=Max. filesize;int;-1 &list_files_minsize=Min. filesize;int;-1 &list_sizeDecimals=Number of decimals to display;int;2 &list_files_only=Files only;list;yes,no;no
+
+    c.  Im Tab "Systemereignisse"
+
+            "OnDocFormRender" und "OnBeforeDocFormSave"
+
+        aktivieren.
+
+
+4.  Eine oder mehrere TVs vom Eingabetyp Text anlegen und mind. einem Template
+    die Berechtigung geben.
+
+================================================================================
+Konfiguration
+================================================================================
+
+A.  Für
+      · die Standardkonfiguration oder
+      · die Benutzung von nur einer TV oder
+      · die Benutzung von mehreren TV mit demselben Verzeichnisbaum für alle 
+        zugewiesenen TVs (kommaseparierte Liste von IDs)
+
+    werden die Einstellungen in der Plugin-Konfiguration im Manager-Backend
+    vorgenommen.
+
+    Die Einstellungen sind in der Datei "configs/default.config.inc.php"
+    (auf Englisch) dokumentiert.
+
+B.  Für mindestens zwei TVs mit verschiedenen Listen gibt es (zusätzlich
+    zu Punkt A) noch 2 Möglickkeiten der Konfiguration:
+
+    1. Möglichkeit (= die einfachere):
+
+        Konfiguration im Manager-Backend (nur für Manager)
+
+        ·   Mit einem Klick auf die "CONFIG"-Schaltfläche links neben der
+            Verzeichnisliste wird die Schlafläche vergrössert und es werden
+            3 Elemente angezeigt:
+                - Name der TV-Konfiguration
+                - Optionsliste
+                - Checkfeld
+
+        ·   Mit einem Klick auf den Namen der TV-Konfuguration wird ein Fenster
+            mit einem Konfigurationsmenü geöffnet, in welchem die Änderungen
+            der Konfiguration vorgenommen werden.
+
+        ·   Die Optionsliste bietet bei noch nicht existierender
+            Konfigurationsdatei nur die Option "Save" und bei existierender
+            Konfigurationsdatei die beiden Optionen "Reset" (=zurücksetzen) und
+            "Delete" (=löschen).
+
+        ·   Ist ein Häkchen im Checkfeld neben der Optionsliste gesetzt, werden
+            die Änderungen beim nächsten Speichern des Dokuments in eine
+            Konfigurationsdatei im Unterverzeichnis "configs/" des
+            Plugin-Ordners gespeichert.
+
+
+    2. Möglichkeit:
+
+        Benutzung von Konfigurationsdateien
+
+        ·   Kopie der Datei "default.config.inc.php" innerhalb des Ordners
+            "configs/" erstellen.
+
+        ·   Umbenennen der erzeugten Kopie in "*.config.inc.php" (wobei * durch
+            einen beliebigen Namen ersetzt wird, z.B. "tv23.config.inc.php").
+
+        ·   Bearbeiten des Inhaltes der neuen Datei und Werte anpassen.
+
+        ·   Sicherstellen dass sich die neue Datei im Ordner "configs/" befindet.
+
+    Innerhalb der neuen Konfigurationsdatei können nicht benötigte Zeilen und
+    Kommentare beliebig gelöscht werden.
+
+
+
+Die wichtigste Anpassung sind die IDs der (in Punkt 4) angelegten TVs, damit das
+Plugin überhaupt funktioniert.
+
+Die IDs findet man im Manager-Backend in der Listenansicht als Zahlen in
+Klammern hinter den jeweiligen TV- und Template-Namen.
+
+
+Beispiel-Verzeichnisstruktur für das Plugin:
+
+MODx-base-path/
+    assets/
+        plugins/
+            TreeSelect/
+                TreeSelect.class.js
+                TreeSelect.class.php
+                TreeSelect.core.php
+                TreeSelect.styles.css
+                configs/
+                    default.config.inc.php
+                    tv23.config.inc.php
+                    tv25.config.inc.php
+                    tv30.config.inc.php
+
+

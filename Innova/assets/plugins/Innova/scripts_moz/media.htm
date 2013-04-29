@@ -1,0 +1,354 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/media.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+
+function GetElement(oElement,sMatchTag)
+    {
+    while (oElement!=null&&oElement.tagName!=sMatchTag)
+        {
+        if(oElement.tagName=="BODY")return null;
+        oElement=oElement.parentNode;
+        }
+    return oElement;
+    }
+
+function doWindowFocus()
+    {
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+    }
+
+function bodyOnLoad()
+    {
+    loadTxt();
+
+    window.onfocus=doWindowFocus;
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+
+    if(parent.oUtil.obj.cmdAssetManager!="")
+        document.getElementById("btnAsset").style.display="block";
+    if(parent.oUtil.obj.cmdMediaManager!="")
+        document.getElementById("btnAsset").style.display="block";
+
+    realTime()
+    }
+
+function bodyOnUnload() {
+  parent.oUtil.onSelectionChanged=null;
+}
+
+function openAsset()
+    {
+    if(parent.oUtil.obj.cmdAssetManager!="")
+    eval(parent.oUtil.obj.cmdAssetManager);
+  if(parent.oUtil.obj.cmdMediaManager!="")
+    eval(parent.oUtil.obj.cmdMediaManager);
+    }
+
+function setAssetValue(v)
+    {
+    document.getElementById("inpURL").value = v;
+    }
+
+function modalDialogShow(url,width,height)
+    {
+    parent.modalDialogShow(url,width,height, window);
+    }
+
+function realTime()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+
+    clearAllProperties()
+
+    var oEl = parent.getSelectedElement(oSel);
+    oEl = GetElement(oEl, "OBJECT")
+    if (oEl) {oEl = oEl.getElementsByTagName("EMBED")[0]}
+
+    if (oEl)
+        {
+        document.getElementById("inpURL").value=oEl.src;
+        document.getElementById("inpWidth").value=oEl.width;
+        document.getElementById("inpHeight").value=oEl.height;
+        if(oEl.getAttribute("autoRewind")=="1") document.getElementById("chkAutoRewind").checked=true;
+        else document.getElementById("chkAutoRewind").checked=false;
+        if(oEl.getAttribute("showDisplay")=="1") document.getElementById("chkShowDisplay").checked=true;
+        else document.getElementById("chkShowDisplay").checked=false;
+        if(oEl.getAttribute("showStatusbar")=="1") document.getElementById("chkShowStatusBar").checked=true;
+        else document.getElementById("chkShowStatusBar").checked=false;
+        if(oEl.getAttribute("showControls")=="1") document.getElementById("chkShowControls").checked=true;
+        else document.getElementById("chkShowControls").checked=false;
+        if(oEl.getAttribute("autoStart")=="1") document.getElementById("chkAutoStart").checked=true;
+        else document.getElementById("chkAutoStart").checked=false;
+
+        document.getElementById("btnApply").style.display="block";
+        document.getElementById("btnOk").style.display="block";
+        document.getElementById("btnInsert").style.display="none";
+        }
+    else
+        {
+        document.getElementById("btnApply").style.display="none";
+        document.getElementById("btnOk").style.display="none";
+        document.getElementById("btnInsert").style.display="block";
+        }
+    }
+
+function clearAllProperties()
+    {
+    document.getElementById("inpURL").value="";
+    document.getElementById("inpWidth").value="320";
+    document.getElementById("inpHeight").value="290";
+    document.getElementById("chkAutoStart").checked=true;
+    document.getElementById("chkShowControls").checked=true;
+    document.getElementById("chkShowStatusBar").checked=false;
+    document.getElementById("chkShowDisplay").checked=false;
+    document.getElementById("chkAutoRewind").checked=true;
+    }
+
+function insertMedia()
+    {
+    var oEditor=parent.oUtil.oEditor;
+
+    parent.oUtil.obj.saveForUndo();
+
+    if(document.getElementById("chkAutoStart").checked)sAutoStart="1";
+    else sAutoStart="0";
+
+    if(document.getElementById("chkShowControls").checked)sShowControls="1";
+    else sShowControls="0";
+
+    if(document.getElementById("chkShowStatusBar").checked)sShowStatusBar="1";
+    else sShowStatusBar="0";
+
+    if(document.getElementById("chkShowDisplay").checked)sShowDisplay="1";
+    else sShowDisplay="0";
+
+    if(document.getElementById("chkAutoRewind").checked)sAutoRewind="1";
+    else sAutoRewind="0";
+
+    var inpURL=document.getElementById("inpURL");
+    //var inpCLassID=document.getElementById("inpCLassID");
+    var inpHeight=document.getElementById("inpHeight")
+    var inpWidth=document.getElementById("inpWidth")
+
+    var sHTML = "<object selThis=\"selThis\" width='"+inpWidth.value+"' height='"+inpHeight.value+"' "+
+        "classid='CLSID:6BF52A52-394A-11D3-B153-00C04F79FAA6' "+
+        "codebase='../../../www.microsoft.com/Windows/Downloads/Contents/MediaPlayer/' >"+
+        "<param name='URL' value='"+inpURL.value+"'>"+
+        "<param name='autoStart' value='"+(sAutoStart=="1"?"true":"false")+"'>"+
+        "<param name='uiMode' value='"+(sShowControls=="1"?"full":"none")+"'>"+
+        "<param name='playCount' value='"+(sAutoRewind=="1"?32767:1)+"'>"+
+        "   <embed "+
+        "   type='application/x-mplayer2' "+
+        "   pluginspage='../../../www.microsoft.com/Windows/Downloads/Contents/MediaPlayer/' "+
+        "   width='"+inpWidth.value+"' "+
+        "   height='"+inpHeight.value+"' "+
+        "   src='"+inpURL.value+"' "+
+        "   filename='"+inpURL.value+"' "+
+        "   autostart='"+sAutoStart+"' "+
+        "   showcontrols='"+sShowControls+"' "+
+        "   showstatusbar='"+sShowStatusBar+"' "+
+        "   showdisplay='"+sShowDisplay+"' "+
+        "   autorewind='"+sAutoRewind+"'>"+
+        "   </embed>"+
+        "</object>";
+        /*
+    var sHTML = "<embed selThis=\"selThis\" "+
+        "type='application/x-mplayer2' "+
+        "pluginspage='../../../www.microsoft.com/Windows/Downloads/Contents/MediaPlayer/' "+
+        "width='"+document.getElementById("inpWidth").value+"' "+
+        "height='"+document.getElementById("inpHeight").value+"' "+
+        "src='"+document.getElementById("inpURL").value+"' "+
+        "filename='"+document.getElementById("inpURL").value+"' "+
+        "autostart='"+sAutoStart+"' "+
+        "showcontrols='"+sShowControls+"' "+
+        "showstatusbar='"+sShowStatusBar+"' "+
+        "showdisplay='"+sShowDisplay+"' "+
+        "autorewind='"+sAutoRewind+"'></embed>"
+    */
+    var obj=parent.oUtil.obj;
+    obj.insertHTML(sHTML);
+
+    var allEmb = oEditor.document.getElementsByTagName("EMBED");
+    for(var i=0;i<allEmb.length;i++)
+        {
+        if(allEmb[i].getAttribute("selThis")=="selThis")
+            {
+            allEmb[i].removeAttribute("selThis");
+            var range = oEditor.document.createRange();
+            range.selectNode(allEmb[i]);
+            var oSelRange = oEditor.getSelection()
+            oSelRange.removeAllRanges();
+            oSelRange.addRange(range);
+            }
+        }
+
+    realTime();
+
+    parent.realTime(parent.oUtil.obj);
+    parent.oUtil.obj.selectElement(0);
+    }
+
+function updateMedia()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+
+    parent.oUtil.obj.saveForUndo();
+
+    var oObj = parent.getSelectedElement(oSel);
+    oObj = GetElement(oObj, "OBJECT");
+
+    var oEl=null;
+    if (oObj) {
+      oObj.width=document.getElementById("inpWidth").value;
+      oObj.height=document.getElementById("inpHeight").value;
+
+      var allParams = oObj.getElementsByTagName("PARAM");
+      if (allParams.length) {
+        for (var i=0;i < allParams.length; i++) {
+          if (allParams[i].name=="playCount") {allParams[i].value=(document.getElementById("chkAutoRewind").checked?32767:1);}
+          if (allParams[i].name=="autoStart") {allParams[i].value=(document.getElementById("chkAutoStart").checked?"true":"false");}
+          if (allParams[i].name=="uiMode") {allParams[i].value=(document.getElementById("chkShowControls").checked?"full":"none");}
+          if (allParams[i].name=="URL") {allParams[i].value=document.getElementById("inpURL").value;}
+        }
+      }
+
+      oEl = oObj.getElementsByTagName("EMBED")[0]
+    }
+
+    if (oEl)
+        {
+        oEl.src=document.getElementById("inpURL").value;
+        oEl.width=document.getElementById("inpWidth").value;
+        oEl.height=document.getElementById("inpHeight").value;
+
+        if(document.getElementById("chkAutoRewind").checked)oEl.setAttribute("autoRewind", "1");
+        else oEl.setAttribute("autoRewind", "0");
+        if(document.getElementById("chkShowDisplay").checked)oEl.setAttribute("showDisplay", "1");
+        else oEl.setAttribute("showDisplay", "0");
+        if(document.getElementById("chkShowStatusBar").checked)oEl.setAttribute("showStatusbar", "1");
+        else oEl.setAttribute("showStatusbar", "0");
+        if(document.getElementById("chkShowControls").checked)oEl.setAttribute("showControls", "1");
+        else oEl.setAttribute("showControls", "0");
+        if(document.getElementById("chkAutoStart").checked)oEl.setAttribute("autoStart", "1");
+        else oEl.setAttribute("autoStart", "0");
+        }
+    realTime()
+    window.focus();
+    }
+
+</script>
+</head>
+<body style="overflow:hidden;">
+
+<table width=100% height=100% align=center cellpadding=0 cellspacing=0>
+<tr>
+<td valign=top style="padding:5;height:100%">
+
+    <table cellpadding=2 cellspacing=0  style="width:100%">
+    <tr>
+        <td nowrap><span id="txtLang" name="txtLang">Source</span>:&nbsp;&nbsp;</td>
+        <td colspan="4" style="width:100%">
+            <table cellpadding="0" cellspacing="0" style="width:100%">
+            <tr>
+            <td style="width:100%"><input type="text" name=inpURL id=inpURL size=45 value="" style="width:100%" class="inpTxt"></td>
+            <td><input type="button" value="" onclick="openAsset()" id="btnAsset" name="btnAsset" style="display:none;background:url('openAsset.gif');width:20px;height:16px;border:#a5acb2 1px solid;margin-left:1px;"></td>
+            </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td nowrap><span id="txtLang" name="txtLang">Width</span>:</td>
+        <td colspan="4"><input type="text" name="inpWidth" id="inpWidth" value=320 size=4 class="inpTxt"></td>
+    </tr>
+    <tr>
+        <td nowrap><span id="txtLang" name="txtLang">Height</span>:</td>
+        <td colspan="4"><input type="text" name="inpHeight" id="inpHeight" value=290 size=4 class="inpTxt"></td>
+    </tr>
+    <!--
+    <tr>
+        <td colspan="5"><hr>
+        </td>
+    </tr>
+    <tr>
+        <td><span id="txtLang" name="txtLang">Class ID</span>:&nbsp;&nbsp;</td>
+        <td colspan="4">
+            <select id="inpCLassID" name="inpCLassID">
+            <option value="CLSID:22d6f312-b0f6-11d0-94ab-0080c74c7e95" selected>CLSID:22d6f312-b0f6-11d0-94ab-0080c74c7e95</option>
+            <option value="CLSID:6BF52A52-394A-11D3-B153-00C04F79FAA6">CLSID:6BF52A52-394A-11D3-B153-00C04F79FAA6</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5" height="7px">
+        </td>
+    </tr>-->
+    <tr>
+        <td nowrap><span id="txtLang" name="txtLang">Auto Start</span>:</td>
+        <td>
+        <input type="checkbox" name="chkAutoStart" id="chkAutoStart" class="inpChk" checked>
+        </td>
+        <td colspan="3" rowspan="5">
+            &nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td nowrap><span id="txtLang" name="txtLang">Show Controls</span>:</td>
+        <td nowrap>
+        <input type="checkbox" name="chkShowControls" id="chkShowControls" class="inpChk" checked>
+        </td>
+    </tr>
+    <tr style='display:none'>
+        <td nowrap><span id="txtLang" name="txtLang">Show Status Bar</span>:</td>
+        <td nowrap>
+        <input type="checkbox" name="chkShowStatusBar" id="chkShowStatusBar" class="inpChk">
+        </td>
+    </tr>
+    <tr style='display:none'>
+        <td nowrap><span id="txtLang" name="txtLang">Show Display</span>:</td>
+        <td nowrap>
+        <input type="checkbox" name="chkShowDisplay" id="chkShowDisplay" class="inpChk">
+        </td>
+    </tr>
+    <tr>
+        <td nowrap><span id="txtLang" name="txtLang">Auto Rewind</span>:</td>
+        <td nowrap>
+        <input type="checkbox" name="chkAutoRewind" id="chkAutoRewind" class="inpChk" checked>
+        </td>
+    </tr>
+    </table>
+
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" align="right">
+    <table cellpadding=0 cellspacing=0>
+    <tr>
+    <td>
+    <input type="button" name=btnCancel id=btnCancel value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    <td>
+    <input type="button" name=btnInsert id=btnInsert value="insert" onclick="insertMedia();self.close()" style="display:block" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    <td>
+    <input type="button" name=btnApply id=btnApply value="apply" onclick="updateMedia()" style="display:none" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    <td>
+    <input type="button" name=btnOk id=btnOk value=" ok " onclick="updateMedia();self.close()" style="display:none;" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    </tr>
+    </table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

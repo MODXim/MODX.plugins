@@ -1,0 +1,153 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/form_file.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+function GetElement(oElement,sMatchTag)
+    {
+    while (oElement!=null&&oElement.tagName!=sMatchTag)
+        {
+        if(oElement.tagName=="BODY")return null;
+        oElement=oElement.parentNode;
+        }
+    return oElement;
+    }
+
+function doWindowFocus()
+    {
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+    }
+
+function bodyOnLoad()
+    {
+    loadTxt();
+
+    window.onfocus=doWindowFocus;
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+
+    realTime()
+    }
+
+function bodyOnUnload() {
+  parent.oUtil.onSelectionChanged=null;
+}
+
+function realTime()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+
+    var selEl = parent.getSelectedElement(oSel);
+    oEl = GetElement(selEl, "INPUT");
+
+    var btnInsert = document.getElementById("btnInsert");
+    var btnApply = document.getElementById("btnApply");
+    var btnOk = document.getElementById("btnOk");
+
+    var inpName = document.getElementById("inpName");
+
+    if (oEl)
+        {
+        if(oEl.type=="file")
+            {
+            btnInsert.style.display="none";
+            btnApply.style.display="block";
+            btnOk.style.display="block";
+
+            if(oEl.name)inpName.value=oEl.name;
+            }
+        }
+    else
+        {
+        btnInsert.style.display="block";
+        btnApply.style.display="none";
+        btnOk.style.display="none";
+
+        inpName.value="file1";
+        }
+    }
+
+function doApply()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+
+    var selEl = parent.getSelectedElement(oSel);
+    oEl = GetElement(selEl, "INPUT");
+
+    var inpName = document.getElementById("inpName");
+
+    parent.oUtil.obj.saveForUndo();
+
+    if (oEl)
+        {
+        if(oEl.type=="file")
+            {
+            if(oEl.name) oEl.name=inpName.value;
+            }
+        }
+    else
+        {
+        elm = oEditor.document.createElement("INPUT");
+        elm.type = "file";
+        elm.name = inpName.value;
+
+        oSel = oEditor.getSelection();
+        range = oSel.getRangeAt(0);
+        range.collapse(true);
+        range.insertNode(elm);
+        range = oEditor.document.createRange();
+        range.selectNodeContents(elm);
+        oSel = oEditor.getSelection();
+        oSel.removeAllRanges();
+        oSel.addRange(range);
+        }
+
+    realTime();
+    parent.realTime(parent.oUtil.obj);
+    parent.oUtil.obj.selectElement(0);
+    window.setTimeout("window.focus()", 10);
+    }
+
+</script>
+</head>
+<body style="overflow:hidden;">
+
+<table width=100% height=100% align=center cellpadding=0 cellspacing=0>
+<tr>
+<td valign=top style="padding:5px;height:100%">
+    <table width=100%>
+    <tr>
+        <td nowrap><span id=txtLang name="txtLang">Name</span>:&nbsp;&nbsp;</td>
+        <td width=100%><INPUT type="text" ID="inpName" NAME="inpName" style="width:100%" value="file1" class="inpTxt"></td>
+    </tr>
+    </table>
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" align="right">
+    <table cellpadding=0 cellspacing=0>
+    <td>
+    <input type=button name=btnCancel id=btnCancel value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    <td>
+    <input type=button name=btnInsert id=btnInsert value="insert" onclick="doApply();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    <td>
+    <input type=button name=btnApply id=btnApply value="apply" style="display:none" onclick="doApply()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    <td>
+    <input type=button name=btnOk id=btnOk value=" ok " style="display:none;" onclick="doApply();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    </table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

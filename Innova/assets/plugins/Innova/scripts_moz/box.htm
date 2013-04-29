@@ -1,0 +1,741 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/box.js'></scr"+"ipt>");
+</script>
+<script language="JavaScript" src="color_picker.js"></script>
+<script>writeTitle()</script>
+<script>
+var dialogArgument=['parent', 'parent'];
+function doWindowFocus()
+    {
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+    }
+
+function bodyOnLoad()
+    {
+    loadTxt();
+
+    window.onfocus=doWindowFocus;
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+
+    realTime();
+    }
+
+function bodyOnUnload() {
+  parent.oUtil.onSelectionChanged=null;
+}
+
+function realTime()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+
+    var oElement;
+    if(parent.oUtil.activeElement)
+        {
+        oElement=parent.oUtil.activeElement
+        }
+    else
+        {
+        oElement = parent.getSelectedElement(oSel);
+        }
+    document.getElementById("inpMarginLeft").value=(oElement.style.marginLeft!=null?oElement.style.marginLeft.replace(/\D+/gi, ""):"");
+    document.getElementById("inpMarginRight").value=(oElement.style.marginRight!=null?oElement.style.marginRight.replace(/\D+/gi, ""):"");
+    document.getElementById("inpMarginTop").value=(oElement.style.marginTop!=null?oElement.style.marginTop.replace(/\D+/gi, ""):"");
+    document.getElementById("inpMarginBottom").value=(oElement.style.marginBottom!=null?oElement.style.marginBottom.replace(/\D+/gi, ""):"");
+    document.getElementById("inpPaddingLeft").value=(oElement.style.paddingLeft!=null?oElement.style.paddingLeft.replace(/\D+/gi, ""):"");
+    document.getElementById("inpPaddingRight").value=(oElement.style.paddingRight!=null?oElement.style.paddingRight.replace(/\D+/gi, ""):"");
+    document.getElementById("inpPaddingTop").value=(oElement.style.paddingTop!=null?oElement.style.paddingTop.replace(/\D+/gi, ""):"");
+    document.getElementById("inpPaddingBottom").value=(oElement.style.paddingBottom!=null?oElement.style.paddingBottom.replace(/\D+/gi, ""):"");
+
+    var inpWidth = document.getElementById("inpWidth");
+    var inpHeight = document.getElementById("inpHeight");
+    var inpAutoFitMeasure1 = document.getElementById("inpAutoFitMeasure1");
+    var inpAutoFitMeasure2 = document.getElementById("inpAutoFitMeasure2");
+
+    if(oElement.style.width == "")inpWidth.value="";
+    if(oElement.style.width.substr(oElement.style.width.length-2,2)=="px")
+        {
+        inpAutoFitMeasure1.value = "px";
+        inpWidth.value = oElement.style.width.substr(0,oElement.style.width.length-2);
+        }
+    if(oElement.style.width.substr(oElement.style.width.length-1,1)=="%")
+        {
+        inpAutoFitMeasure1.value = "%";
+        inpWidth.value = oElement.style.width.substr(0,oElement.style.width.length-1)
+        }
+    if(oElement.style.height == "")inpHeight.value="";
+    if(oElement.style.height.substr(oElement.style.height.length-2,2)=="px")
+        {
+        inpAutoFitMeasure2.value = "px";
+        inpHeight.value = oElement.style.height.substr(0,oElement.style.height.length-2);
+        }
+    if(oElement.style.height.substr(oElement.style.height.length-1,1)=="%")
+        {
+        inpAutoFitMeasure2.value = "%";
+        inpHeight.value = oElement.style.height.substr(0,oElement.style.height.length-1)
+        }
+
+    //Select Border Width
+    if(oElement.style.borderLeftWidth==oElement.style.borderTopWidth &&
+        oElement.style.borderLeftWidth==oElement.style.borderRightWidth &&
+        oElement.style.borderLeftWidth==oElement.style.borderBottomWidth)
+        {
+        var sBorderWidth = oElement.style.borderLeftWidth;
+
+        var oNodes=document.getElementById("tblBorderWidth").childNodes[0].childNodes
+        for(var i=0;i<oNodes.length;i++)
+            {
+            oNodes[i].childNodes[0].style.backgroundColor='#ffffff';
+            oNodes[i].childNodes[0].style.border='#ffffff 1px solid';
+            }
+        if(document.getElementById("idWidth_"+sBorderWidth))
+            {
+            document.getElementById("idWidth_"+sBorderWidth).style.backgroundColor='#f1f1f1';
+            document.getElementById("idWidth_"+sBorderWidth).style.border='#718191 1px solid';
+            }
+        else
+            {
+            //alert("INFO: The border width size or unit is not available in the Width selection list.")
+            }
+        document.getElementById("idSelBorderWidth").value=sBorderWidth;
+        }
+
+    //Select Border Style
+    if(oElement.style.borderLeftStyle==oElement.style.borderTopStyle &&
+        oElement.style.borderLeftStyle==oElement.style.borderRightStyle &&
+        oElement.style.borderLeftStyle==oElement.style.borderBottomStyle)
+        {
+        var sBorderStyle = oElement.style.borderLeftStyle;
+
+
+        var oNodes=document.getElementById("tblBorderStyle").childNodes[0].childNodes
+        for(var i=0;i<oNodes.length;i++)
+            {
+            oNodes[i].childNodes[0].style.backgroundColor='#ffffff';
+            oNodes[i].childNodes[0].style.border='#ffffff 1px solid';
+            }
+        if(sBorderStyle!="")
+            {
+            document.getElementById("idStyle_"+sBorderStyle).parentNode.style.backgroundColor='#f1f1f1';
+            document.getElementById("idStyle_"+sBorderStyle).parentNode.style.border='#708090 1px solid';
+            document.getElementById("idSelBorderStyle").value=sBorderStyle;
+            }
+        else
+            {
+            //alert("INFO: ")
+            }
+        }
+
+    //Select ApplyTo
+    var oNodes=document.getElementById("tblBorderApplyTo").childNodes[0].childNodes
+    for(var i=0;i<oNodes.length;i++)
+        {
+        oNodes[i].childNodes[0].style.backgroundColor='#ffffff';
+        oNodes[i].childNodes[0].style.border='#ffffff 1px solid';
+        }
+    if((oElement.style.borderLeftWidth.substring(0,1)!="0") &&
+        (oElement.style.borderTopWidth.substring(0,1)=="0") &&
+        (oElement.style.borderRightWidth.substring(0,1)=="0") &&
+        (oElement.style.borderBottomWidth.substring(0,1)=="0"))
+        {
+        //Left
+        document.getElementById("idApplyTo_Left").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_Left").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_Left";
+        }
+    if((oElement.style.borderLeftWidth.substring(0,1)=="0") &&
+        (oElement.style.borderTopWidth.substring(0,1)!="0") &&
+        (oElement.style.borderRightWidth.substring(0,1)=="0") &&
+        (oElement.style.borderBottomWidth.substring(0,1)=="0"))
+        {
+        //Top
+        document.getElementById("idApplyTo_Top").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_Top").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_Top";
+        }
+    if((oElement.style.borderLeftWidth.substring(0,1)=="0") &&
+        (oElement.style.borderTopWidth.substring(0,1)=="0") &&
+        (oElement.style.borderRightWidth.substring(0,1)!="0") &&
+        (oElement.style.borderBottomWidth.substring(0,1)=="0"))
+        {
+        //Right
+        document.getElementById("idApplyTo_Right").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_Right").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_Right";
+        }
+    if((oElement.style.borderLeftWidth.substring(0,1)=="0") &&
+        (oElement.style.borderTopWidth.substring(0,1)=="0") &&
+        (oElement.style.borderRightWidth.substring(0,1)=="0") &&
+        (oElement.style.borderBottomWidth.substring(0,1)!="0"))
+        {
+        //Bottom
+        document.getElementById("idApplyTo_Bottom").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_Bottom").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_Bottom";
+        }
+    if((oElement.style.borderLeftWidth.substring(0,1)!="0") &&
+        (oElement.style.borderTopWidth.substring(0,1)!="0") &&
+        (oElement.style.borderRightWidth.substring(0,1)!="0") &&
+        (oElement.style.borderBottomWidth.substring(0,1)!="0"))
+        {
+        //Outside
+        document.getElementById("idApplyTo_Outside").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_Outside").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_Outside";
+        }
+    if((oElement.style.borderLeftWidth=="medium") &&
+        (oElement.style.borderTopWidth=="medium") &&
+        (oElement.style.borderRightWidth=="medium") &&
+        (oElement.style.borderBottomWidth=="medium"))
+        {
+        //Width is not specified
+        document.getElementById("idApplyTo_Outside").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_Outside").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_Outside";
+        }
+    if((oElement.style.borderLeftWidth.substring(0,1)=="0") &&
+        (oElement.style.borderTopWidth.substring(0,1)=="0") &&
+        (oElement.style.borderRightWidth.substring(0,1)=="0") &&
+        (oElement.style.borderBottomWidth.substring(0,1)=="0"))
+        {
+        //None
+        document.getElementById("idApplyTo_None").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_None").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_None";
+        }
+
+    //Select Border & Shading Color
+    oColor1.color=oElement.style.borderLeftColor;
+    document.getElementById("idSelBorderColor").style.backgroundColor=oElement.style.borderLeftColor;
+    oColor2.color=oElement.style.backgroundColor;
+    document.getElementById("idSelShadingColor").style.backgroundColor=oElement.style.backgroundColor;
+    }
+
+document.onclick=hideAll;
+function hideAll()
+    {
+    oColor1.hide();oColor2.hide();
+    }
+
+/*****************************
+    APPLY
+*****************************/
+function doApply()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+
+    parent.oUtil.obj.saveForUndo();
+
+    var oElement;
+    if (parent.isTextSelected(oSel)&&oSel.getRangeAt(0).toString() != "") {
+        oElement = parent.oUtil.obj.applySpan("DIV");
+    } else {
+        if(parent.oUtil.activeElement)
+            {
+            oElement=parent.oUtil.activeElement
+            }
+        else
+            {
+            oElement = parent.getSelectedElement(oSel);
+            }
+
+        if(oElement.nodeName=="BODY")return;
+    }
+
+    doApplyBorder(oElement);
+
+    oElement.style.paddingLeft = document.getElementById("inpPaddingLeft").value;
+    oElement.style.paddingRight = document.getElementById("inpPaddingRight").value;
+    oElement.style.paddingTop = document.getElementById("inpPaddingTop").value;
+    oElement.style.paddingBottom = document.getElementById("inpPaddingBottom").value;
+
+    oElement.style.marginLeft = document.getElementById("inpMarginLeft").value;
+    oElement.style.marginRight = document.getElementById("inpMarginRight").value;
+    oElement.style.marginTop = document.getElementById("inpMarginTop").value;
+    oElement.style.marginBottom = document.getElementById("inpMarginBottom").value;
+
+    if(document.getElementById("inpWidth").value=="")oElement.style.width="";
+    else oElement.style.width=document.getElementById("inpWidth").value+document.getElementById("inpAutoFitMeasure1").value;
+    if(document.getElementById("inpHeight").value=="")oElement.style.height="";
+    else oElement.style.height=document.getElementById("inpHeight").value+document.getElementById("inpAutoFitMeasure2").value;
+    oElement.removeAttribute("width",0);
+    oElement.removeAttribute("height",0);
+
+    }
+
+function doApplyBorder(oElement)
+    {
+    sStyle=document.getElementById("idSelBorderStyle").value
+    sWidth=document.getElementById("idSelBorderWidth").value
+    sApplyTo=document.getElementById("idSelBorderApplyTo").value
+    sColor=document.getElementById("idSelBorderColor").style.backgroundColor
+    sShadingColor=document.getElementById("idSelShadingColor").style.backgroundColor
+
+    switch(sApplyTo)
+        {
+        case "idApplyTo_None":
+            oElement.style.border="none";
+            break;
+        case "idApplyTo_Outside":
+            if(sStyle=="none")oElement.style.border="none";
+            else oElement.style.border=sColor + " " + sWidth + " " + sStyle;
+            break;
+        case "idApplyTo_Left":
+            if(sStyle=="none") oElement.style.borderLeft="none";
+            else oElement.style.borderLeft=sColor + " " + sWidth + " " + sStyle;
+            break;
+        case "idApplyTo_Top":
+            if(sStyle=="none")oElement.style.borderTop="none";
+            else oElement.style.borderTop=sColor + " " + sWidth + " " + sStyle;
+            break;
+        case "idApplyTo_Right":
+            if(sStyle=="none")oElement.style.borderRight="none";
+            else oElement.style.borderRight=sColor + " " + sWidth + " " + sStyle;
+            break;
+        case "idApplyTo_Bottom":
+            if(sStyle=="none")oElement.style.borderBottom="none";
+            else oElement.style.borderBottom=sColor + " " + sWidth + " " + sStyle;
+            break;
+        }
+
+    oElement.style.backgroundColor=sShadingColor;
+    }
+
+/*****************************
+    Mouse Over/Out
+*****************************/
+function doOver(me)
+    {
+    if(extractRGBColor(me.style.backgroundColor)!='f1f1f1')
+        {
+        me.style.backgroundColor='#f0f0f0';
+        me.style.border='#708090 1px solid';
+        }
+    }
+function doOut(me)
+    {
+    if(extractRGBColor(me.style.backgroundColor)!='f1f1f1')
+        {
+        me.style.backgroundColor='#ffffff';
+        me.style.border='#ffffff 1px solid';
+        }
+    }
+
+/*****************************
+    Border Style
+*****************************/
+/*
+function drawBorderStyleSelection()
+    {
+    arrStyleOptions=[   ["idStyle_Solid","border-bottom:black 1px solid;height:10px;"],
+                        ["idStyle_Dotted","border-bottom:black dotted;height:10px"],
+                        ["idStyle_Dashed","border-bottom:black dashed;height:10px"],
+                        ["idStyle_Double","border-bottom:black double;height:10px"],
+                        ["idStyle_Groove","border-style:groove;height:18px"],
+                        ["idStyle_Ridge","border-style:ridge;height:18px"],
+                        ["idStyle_Inset","border-style:inset;height:18px"],
+                        ["idStyle_Outset","border-style:outset;height:18px"]];
+    sHTML="<div style='overflow:auto;border:gray 1px solid;width:125px;height:127px;'>"
+    sHTML+="<table id=tblBorderStyle cellpadding=0 cellspacing=0 width=100% style='table-layout:fixed;background:white'>"
+    sHTML+="<tr>"
+    sHTML+="<td valign=middle onclick=\"doSelectBorderStyle(this)\" style=\"cursor:default;height:25px;padding:4px;\" onmouseover=\"doOver(this);\" onmouseout=\"doOut(this);\">"
+    sHTML+="    <table id=idStyle_None name=idStyle_None style='border:none' cellpadding=0 cellspacing=0 width=100%><tr><td valign=top>" + getTxt("No Border") + "</td></tr></table>"
+    sHTML+="</td>"
+    sHTML+="</tr>"
+    for(var i=0;i<arrStyleOptions.length;i++)
+        {
+        if(i==0) sDefaultSelected="border:#708090 1px solid;background-color:#f1f1f1;";
+        else sDefaultSelected="";
+        sHTML+="<tr>"
+        sHTML+="<td valign=top onclick=\"doSelectBorderStyle(this)\" style=\"height:25px;padding:4px;border:white 1px solid;"+sDefaultSelected+"\" onmouseover=\"doOver(this);\" onmouseout=\"doOut(this);\">"
+        sHTML+="    <table id="+arrStyleOptions[i][0]+" name="+arrStyleOptions[i][0]+" style='"+arrStyleOptions[i][1]+"' width=100%><tr><td></td></tr></table>"
+        sHTML+="</td>"
+        sHTML+="</tr>"
+        }
+    sHTML+="</table><input type=hidden name=idSelBorderStyle id=idSelBorderStyle value='solid'>"
+    sHTML+="</div>"
+    document.write(sHTML)
+    }
+*/
+function drawBorderStyleSelection(idSelected)
+    {
+    arrStyleOptions=[   ["idStyle_none","border:none;height:10px;",getTxt("No Border")],
+                        ["idStyle_solid","border-bottom:black 1px solid;height:10px;",""],
+                        ["idStyle_dotted","border-bottom:black dotted;height:10px",""],
+                        ["idStyle_dashed","border-bottom:black dashed;height:10px",""],
+                        ["idStyle_double","border-bottom:black double;height:10px",""],
+                        ["idStyle_groove","border-style:groove;height:18px",""],
+                        ["idStyle_ridge","border-style:ridge;height:18px",""],
+                        ["idStyle_inset","border-style:inset;height:18px",""],
+                        ["idStyle_outset","border-style:outset;height:18px",""]];//[ID,CssText,Caption)
+    sHTML="<div style='overflow:auto;border:gray 1px solid;width:125px;height:127px;'>"
+    sHTML+="<table id=tblBorderStyle cellpadding=0 cellspacing=0 width=100% style='table-layout:fixed;background:white'>"
+    for(var i=0;i<arrStyleOptions.length;i++)
+        {
+        sHTML+="<tr>"
+        sHTML+="<td valign=top onclick=\"doSelectBorderStyle(this)\" style=\"cursor:default;height:25px;padding:4px;border:white 1px solid;\" onmouseover=\"doOver(this);\" onmouseout=\"doOut(this);\">"
+        sHTML+="    <table id="+arrStyleOptions[i][0]+" name="+arrStyleOptions[i][0]+" style='"+arrStyleOptions[i][1]+"' width=100%><tr><td>"+arrStyleOptions[i][2]+"</td></tr></table>"
+        sHTML+="</td>"
+        sHTML+="</tr>"
+        }
+    sHTML+="</table><input type=hidden name=idSelBorderStyle id=idSelBorderStyle>"
+    sHTML+="</div>"
+    document.write(sHTML)
+    }
+
+function doSelectBorderStyle(me)
+    {
+    oNodes=document.getElementById("tblBorderStyle").childNodes[0].childNodes
+    for(var i=0;i<oNodes.length;i++)
+        {
+        oNodes[i].childNodes[0].style.backgroundColor='#ffffff';
+        oNodes[i].childNodes[0].style.border='#ffffff 1px solid';
+        }
+    me.style.backgroundColor='#f1f1f1';
+    me.style.border='#708090 1px solid';
+    document.getElementById("idSelBorderStyle").value=me.childNodes[1].style.borderBottomStyle;
+    }
+
+/*****************************
+    Border Width
+*****************************/
+/*
+function drawBorderWidthSelection()
+    {
+    arrWidthOptions=[["idWidth_1","1pt","border-bottom:black 1pt solid;height:16px;"],
+                    ["idWidth_2","2pt","border-bottom:black 2pt solid;height:16px;"],
+                    ["idWidth_3","3pt","border-bottom:black 3pt solid;height:16px;"],
+                    ["idWidth_4","4pt","border-bottom:black 4pt solid;height:16px;"],
+                    ["idWidth_5","5pt","border-bottom:black 5pt solid;height:16px;"],
+                    ["idWidth_6","6pt","border-bottom:black 6pt solid;height:16px;"],
+                    ["idWidth_7","7pt","border-bottom:black 7pt solid;height:16px;"]];
+    sHTML="<div style='overflow:auto;border:gray 1px solid;width:125px;height:127px'>"
+    sHTML+="<table id=tblBorderWidth cellpadding=0 cellspacing=0 width=100% style='table-layout:fixed;background:white'>"
+    for(var i=0;i<arrWidthOptions.length;i++)
+        {
+        if(i==0)
+            {//DEFAULT
+            sHTML+="<tr>"
+            sHTML+="<td id="+arrWidthOptions[i][0]+" name="+arrWidthOptions[i][0]+" style=\"height:25px;padding:1px;border:white 1px solid;border:#708090 1px solid;background-color:#f1f1f1\" onclick=\"doSelectBorderWidth(this)\" onmouseover=\"doOver(this);\" onmouseout=\"doOut(this);\">"
+            sHTML+="    <table width=100%><tr><td style=\"height:25px\" >"+arrWidthOptions[i][1]+"</td><td valign=top width=100%><table style='"+arrWidthOptions[i][2]+"' width=100%><tr><td></td></tr></table> </td></tr></table>"
+            sHTML+="</td>"
+            sHTML+="</tr>"
+            }
+        else
+            {
+            sHTML+="<tr>"
+            sHTML+="<td id="+arrWidthOptions[i][0]+" name="+arrWidthOptions[i][0]+" style=\"height:25px;padding:1px;border:white 1px solid;\" onclick=\"doSelectBorderWidth(this)\" onmouseover=\"doOver(this);\" onmouseout=\"doOut(this);\">"
+            sHTML+="    <table width=100%><tr><td style=\"height:25px\" >"+arrWidthOptions[i][1]+"</td><td valign=top width=100%><table style='"+arrWidthOptions[i][2]+"' width=100%><tr><td></td></tr></table> </td></tr></table>"
+            sHTML+="</td>"
+            sHTML+="</tr>"
+            }
+        }
+    sHTML+="</table><input type=hidden name=idSelBorderWidth id=idSelBorderWidth value='1pt'>"
+    sHTML+="</div>"
+    document.write(sHTML)
+    }
+*/
+
+function drawBorderWidthSelection()
+    {
+    arrWidthOptions=[["idWidth_1px","border-bottom:black 1px solid;height:16px;","1px"],
+                     ["idWidth_2px","border-bottom:black 2px solid;height:16px;","2px"],
+                     ["idWidth_3px","border-bottom:black 3px solid;height:16px;","3px"],
+                     ["idWidth_4px","border-bottom:black 4px solid;height:16px;","4px"],
+                     ["idWidth_5px","border-bottom:black 5px solid;height:16px;","5px"],
+                     ["idWidth_6px","border-bottom:black 6px solid;height:16px;","6px"],
+                     ["idWidth_7px","border-bottom:black 7px solid;height:16px;","7px"]];
+    sHTML="<div style='overflow:auto;border:gray 1px solid;width:125px;height:127px'>"
+    sHTML+="<table id=tblBorderWidth cellpadding=0 cellspacing=0 width=100% style='table-layout:fixed;background:white'>"
+    for(var i=0;i<arrWidthOptions.length;i++)
+        {
+        sHTML+="<tr>"
+        sHTML+="<td id="+arrWidthOptions[i][0]+" name="+arrWidthOptions[i][0]+" style=\"height:25px;padding:1px;border:white 1px solid;\" onclick=\"doSelectBorderWidth(this)\" onmouseover=\"doOver(this);\" onmouseout=\"doOut(this);\">"
+        sHTML+="    <table width=100%><tr><td style=\"height:25px\" >"+arrWidthOptions[i][2]+"</td><td valign=top width=100%><table style='"+arrWidthOptions[i][1]+"' width=100%><tr><td></td></tr></table></td></tr></table>"
+        sHTML+="</td>"
+        sHTML+="</tr>"
+        }
+    sHTML+="</table><input type=hidden name=idSelBorderWidth id=idSelBorderWidth>"
+    sHTML+="</div>"
+    document.write(sHTML)
+    }
+
+function doSelectBorderWidth(me)
+    {
+    oNodes=document.getElementById("tblBorderWidth").childNodes[0].childNodes
+    for(var i=0;i<oNodes.length;i++)
+        {
+        oNodes[i].childNodes[0].style.backgroundColor='#ffffff';
+        oNodes[i].childNodes[0].style.border='#ffffff 1px solid';
+        }
+    me.style.backgroundColor='#f1f1f1';
+    me.style.border='#718191 1px solid';
+    document.getElementById("idSelBorderWidth").value=me.childNodes[1].childNodes[0].childNodes[0].childNodes[1].childNodes[0].style.borderBottomWidth;
+    }
+
+/*****************************
+    Border Apply To
+*****************************/
+/*
+function drawBorderApplyToSelection()
+    {
+    arrApplyToOptions=[["idApplyTo_None",getTxt("No Border"),"border/border_none.gif"],
+                    ["idApplyTo_Outside",getTxt("Outside Border"),"border/border_outside.gif"],
+                    ["idApplyTo_Left",getTxt("Left Border"),"border/border_left.gif"],
+                    ["idApplyTo_Top",getTxt("Top Border"),"border/border_top.gif"],
+                    ["idApplyTo_Right",getTxt("Right Border"),"border/border_right.gif"],
+                    ["idApplyTo_Bottom",getTxt("Bottom Border"),"border/border_bottom.gif"]];
+    sHTML="<div style='overflow:auto;border:gray 1px solid;width:60px;height:127px'>"
+    sHTML+="<table id=tblBorderApplyTo cellpadding=0 cellspacing=0 width=100% style='table-layout:fixed;background:white'>"
+    for(var i=0;i<arrApplyToOptions.length;i++)
+        {
+        if(i==1)
+            {//DEFAULT
+            sHTML+="<tr>"
+            sHTML+="<td id="+arrApplyToOptions[i][0]+" name="+arrApplyToOptions[i][0]+" valign=top style=\"height:30px;padding:4px;border:white 1px solid;border:#708090 1px solid;background-color:#f1f1f1\" onclick=\"doSelectBorderApplyTo(this)\" onmouseover=\"doOver(this);\" onmouseout=\"doOut(this);\">"
+            sHTML+="    <img src='"+arrApplyToOptions[i][2]+"' alt='"+arrApplyToOptions[i][1]+"'>"
+            sHTML+="</td>"
+            sHTML+="</tr>"
+            }
+        else
+            {
+            sHTML+="<tr>"
+            sHTML+="<td id="+arrApplyToOptions[i][0]+" name="+arrApplyToOptions[i][0]+" valign=top style=\"height:30px;padding:4px;border:white 1px solid;\" onclick=\"doSelectBorderApplyTo(this)\" onmouseover=\"doOver(this);\" onmouseout=\"doOut(this);\">"
+            sHTML+="    <img src='"+arrApplyToOptions[i][2]+"' alt='"+arrApplyToOptions[i][1]+"'>"
+            sHTML+="</td>"
+            sHTML+="</tr>"
+            }
+        }
+    sHTML+="</table><input type=hidden name=idSelBorderApplyTo id=idSelBorderApplyTo value='idApplyTo_Outside'>"
+    sHTML+="</div>"
+
+    document.write(sHTML)
+    }
+*/
+function drawBorderApplyToSelection()
+    {
+    arrApplyToOptions=[ ["idApplyTo_None","../border/border_none.gif",getTxt("No Border")],
+                        ["idApplyTo_Outside","../border/border_outside.gif",getTxt("Outside Border")],
+                        ["idApplyTo_Left","../border/border_left.gif",getTxt("Left Border")],
+                        ["idApplyTo_Top","../border/border_top.gif",getTxt("Top Border")],
+                        ["idApplyTo_Right","../border/border_right.gif",getTxt("Right Border")],
+                        ["idApplyTo_Bottom","../border/border_bottom.gif",getTxt("Bottom Border")]];
+    sHTML="<div style='overflow:auto;border:gray 1px solid;width:60px;height:127px;background-color:white'>"
+    sHTML+="<table id=tblBorderApplyTo cellpadding=0 cellspacing=0 width=100% style='table-layout:fixed;background:white'>"
+    for(var i=0;i<arrApplyToOptions.length;i++)
+        {
+        sHTML+="<tr>"
+        sHTML+="<td id="+arrApplyToOptions[i][0]+" name="+arrApplyToOptions[i][0]+" valign=top style=\"height:30px;padding:4px;border:white 1px solid;\" onclick=\"doSelectBorderApplyTo(this)\" onmouseover=\"doOver(this);\" onmouseout=\"doOut(this);\">"
+        sHTML+="    <img src='"+arrApplyToOptions[i][1]+"' alt='"+arrApplyToOptions[i][2]+"'>"
+        sHTML+="</td>"
+        sHTML+="</tr>"
+        }
+    sHTML+="</table><input type=hidden name=idSelBorderApplyTo id=idSelBorderApplyTo>"
+    sHTML+="</div>"
+
+    document.write(sHTML)
+    }
+
+function doSelectBorderApplyTo(me)
+    {
+    oNodes=document.getElementById("tblBorderApplyTo").childNodes[0].childNodes
+    for(var i=0;i<oNodes.length;i++)
+        {
+        oNodes[i].childNodes[0].style.backgroundColor='#ffffff';
+        oNodes[i].childNodes[0].style.border='#ffffff 1px solid';
+        }
+    me.style.backgroundColor='#f1f1f1';
+    me.style.border='#718191 1px solid';
+
+    document.getElementById("idSelBorderApplyTo").value=me.id;
+    }
+</script>
+</head>
+
+<body style="overflow:hidden;">
+
+<table width=100% height=100% align=center cellpadding=0 cellspacing=0>
+<tr>
+<td valign=top style="padding:5;padding-bottom:0;height:100%">
+
+    <table>
+    <tr>
+    <td valign=top style="padding:3px;">
+        <script>
+        drawBorderStyleSelection()
+        </script>
+    </td>
+    <td valign=top style="padding:3px">
+        <script>
+        drawBorderWidthSelection()
+        </script>
+    </td>
+    <td valign=top style="padding:3px" nowrap>
+        <script>
+        drawBorderApplyToSelection()
+        </script>
+    </td>
+    <td valign=top style="padding:3px" nowrap>
+        &nbsp;
+    </td>
+    <td valign=top style="padding:3px" nowrap>
+        <div><span id=txtLang name=txtLang>Color</span>:</div>
+
+        <script>
+        document.write("<span style='background:white'>");
+        document.write("    <span id='idSelBorderColor' style='border:gray 1px solid;width:20px;height:20px;margin-right:3px;background-color:#000000'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>");
+        document.write("</span>");
+        document.write("<input type=button value='" + getTxt("Pick") + "' onclick=\"oColor1.show(this);event.cancelBubble=true;\" >");
+
+        var oColor1 = new ColorPicker("oColor1");
+        oColor1.onPickColor = new Function("document.getElementById('idSelBorderColor').style.backgroundColor=oColor1.color;");
+        oColor1.onRemoveColor = new Function("document.getElementById('idSelBorderColor').style.backgroundColor='';");
+        oColor1.align="right";
+        //oColor1.color="#000000";
+        oColor1.txtCustomColors=getTxt("Custom Colors");
+        oColor1.txtMoreColors=getTxt("More Colors...");
+        oColor1.url = parent.oUtil.obj.scriptPath + "color_picker.htm";
+        oColor1.RENDER();
+        </script>
+
+        <div style='margin-top:7'><span id=txtLang name=txtLang>Shading</span>:</div>
+
+        <script>
+        document.write("<span style='background:white'>");
+        document.write("    <span id='idSelShadingColor' style='border:gray 1px solid;width:20px;height:20px;margin-right:3px;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>");
+        document.write("</span>");
+        document.write("<input type=button value='" + getTxt("Pick") + "' onclick=\"oColor2.show(this);event.cancelBubble=true;\" >");
+
+        var oColor2 = new ColorPicker("oColor2");
+        oColor2.onPickColor = new Function("document.getElementById('idSelShadingColor').style.backgroundColor=oColor2.color;");
+        oColor2.onRemoveColor = new Function("document.getElementById('idSelShadingColor').style.backgroundColor='';");
+        oColor2.align="right";
+        //oColor2.color="";
+        oColor2.txtCustomColors=getTxt("Custom Colors");
+        oColor2.txtMoreColors=getTxt("More Colors...");
+        oColor2.url = parent.oUtil.obj.scriptPath + "color_picker.htm";
+        oColor2.RENDER();
+        </script>
+    </td>
+    </tr>
+    </table>
+
+</td>
+</tr>
+<tr>
+<td nowrap style="padding-left:8px">
+
+    <table cellpadding=0 cellspacing=0>
+    <tr>
+    <td>
+        <table cellpadding=2 cellspacing=0>
+        <tr><td colspan=7 id=txtLang name=txtLang>Margin:</td></tr>
+        <tr>
+        <td><span id=txtLang name=txtLang>Left</span>:</td>
+        <td><input type="text" name="inpMarginLeft" id="inpMarginLeft" size=2 class="inpTxt"></td>
+        <td> px</td>
+        <td>&nbsp;</td>
+        <td align=right><span id=txtLang name=txtLang>Right</span>:</td>
+        <td><input type="text" name="inpMarginRight" id="inpMarginRight" size=2 class="inpTxt"></td>
+        <td> px</td>
+        </tr>
+        <tr>
+        <td><span id=txtLang name=txtLang>Top</span>:</td>
+        <td><input type="text" name="inpMarginTop" id="inpMarginTop" size=2 class="inpTxt"></td>
+        <td> px</td>
+        <td>&nbsp;</td>
+        <td align=right><span id=txtLang name=txtLang>Bottom</span>:</td>
+        <td><input type="text" name="inpMarginBottom" id="inpMarginBottom" size=2 class="inpTxt"></td>
+        <td> px</td>
+        </tr>
+        </table>
+
+    </td>
+    <td>
+    <div style="margin:5px;height:55px;border-left:lightgrey 1px solid"></div>
+    </td>
+    <td style="padding-bottom:5px">
+
+        <table cellpadding=2 cellspacing=0>
+        <tr><td colspan=7 id=txtLang name=txtLang>Padding:</td></tr>
+        <tr>
+        <td><span id=txtLang name=txtLang>Left</span>:</td>
+        <td><input type="text" name="inpPaddingLeft" id="inpPaddingLeft" size=2 class="inpTxt"></td>
+        <td> px</td>
+        <td>&nbsp;</td>
+        <td align=right><span id=txtLang name=txtLang>Right</span>:</td>
+        <td><input type="text" name="inpPaddingRight" id="inpPaddingRight" size=2 class="inpTxt"></td>
+        <td> px</td>
+        </tr>
+        <tr>
+        <td><span id=txtLang name=txtLang>Top</span>:</td>
+        <td><input type="text" name="inpPaddingTop" id="inpPaddingTop" size=2 class="inpTxt"></td>
+        <td> px</td>
+        <td>&nbsp;</td>
+        <td align=right><span id=txtLang name=txtLang>Bottom</span>:</td>
+        <td><input type="text" name="inpPaddingBottom" id="inpPaddingBottom" size=2 class="inpTxt"></td>
+        <td> px</td>
+        </tr>
+        </table>
+
+    </td>
+    </tr>
+    <tr>
+    <td colspan=3 style="padding-top:3px;padding-bottom:5px;border-top:lightgrey 1px solid">
+
+        <table cellpadding=2 cellspacing=0>
+        <tr><td colspan=2 id=txtLang name=txtLang>Dimension</td></tr>
+        <tr>
+        <td><span id=txtLang name=txtLang>Width</span>:</td>
+        <td>
+        <input type="text" name="inpWidth" id="inpWidth" size=2 class="inpTxt">
+        <select name="inpAutoFitMeasure1" id="inpAutoFitMeasure1" class="inpSel">
+            <option value="px" id=optLang name=optLang>pixels</option>
+            <option value="%" id=optLang name=optLang>percent</option>
+        </select>
+        </td>
+        </tr>
+        <tr>
+        <td><span id=txtLang name=txtLang>Height</span>:</td>
+        <td>
+        <input type="text" name="inpHeight" id="inpHeight" size=2 class="inpTxt">
+        <select name="inpAutoFitMeasure2" id="inpAutoFitMeasure2" class="inpSel">
+            <option value="px" id=optLang name=optLang>pixels</option>
+            <option value="%" id=optLang name=optLang>percent</option>
+        </select>
+        </td>
+        </tr>
+        </table>
+
+    </td>
+    </tr>
+    </table>
+
+</tr>
+<tr>
+<td class="dialogFooter" align="right" style="padding-top:10px;">
+  <table cellpadding=0 cellspacing=0>
+  <tr>
+  <td>
+    <input type="button" name=btnCancel id=btnCancel value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+    <input type="button" name=btnApply id=btnApply value="apply" onclick="doApply();window.focus(); " class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+    <input type="button" name=btnOk id=btnOk value=" ok " onclick="doApply();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  </tr>
+  </table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

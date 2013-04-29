@@ -1,0 +1,32 @@
+
+ 1. Copy the files to assets/plugins/tvs_on_template
+
+ 2. Create new Plugin
+
+        give it a name you like
+
+ 3. Set Plugin-Events
+
+        * OnTempFormPrerender
+        * OnTempFormRender
+        * OnTempFormDelete
+        * OnTempFormSave
+
+ 4. Set Plugin-Code to
+
+        include MODX_BASE_PATH . 'assets/plugins/tvs_on_template/plugin.php';
+
+ 5. Set Plugin-Configuration to
+ 
+&use_cm  = <h5>Categories Manager in use?</h5><p>What's that?</p><p>The categories could displayed by a ordered ranking.<br><strong>If true and the Manager is not installed, an error will occur</strong></p><p>Please visit: http://modxcms.com/extras/package/587</p>;list;true,false;false
+
+    Note:
+    -----   
+        The switch "Categories Manager in use" is depend on the module 
+        "MODx Categories Manager" - http://modxcms.com/extras/package/587
+
+        That module gives you the possibility to manage and sort the modx-categories.
+     
+ 6. Save plugin
+
+    Finish

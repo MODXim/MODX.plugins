@@ -1,0 +1,367 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/table_insert.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+
+var oTU=new TableUtilities();
+
+function TableUtilities()
+    {
+    this.oTD;
+    }
+
+function GetElement(oElement,sMatchTag)
+    {
+    while (oElement!=null&&oElement.tagName!=sMatchTag)
+        {
+        if(oElement.tagName=="BODY")return null;
+        oElement=oElement.parentNode;
+        }
+    return oElement;
+    }
+
+function tableClick(oTD)
+    {
+    if(oTD.tagName!="TD")return;
+
+    oTable=GetElement(oTD,"TABLE");
+
+    for(var i=0;i<oTable.rows.length;i++)
+        {
+        oCurrTR=oTable.rows[i];
+        for(var j=0;j<oCurrTR.cells.length;j++)
+            {
+            oCurrTD=oCurrTR.cells[j]
+            oCurrTD.style.backgroundColor="white";
+            }
+        }
+    oTD.style.backgroundColor="#fac606";
+    oTU.oTD=oTD;
+    }
+
+function doColSpan()
+    {
+    if(oTU.oTD==null)return;
+    var oTD = oTU.oTD
+    var oTable=GetElement(oTD,"TABLE")
+
+    if(oTD.nextSibling!=null)
+        {
+        var numOfSpan=oTD.nextSibling.getAttribute("COLSPAN");
+        numOfSpan = numOfSpan==null ? 1 : parseInt(numOfSpan);
+        oTable.rows[oTD.parentNode.rowIndex].deleteCell(oTD.nextSibling.cellIndex);
+        var curCellSpan = oTD.getAttribute("COLSPAN");
+        curCellSpan = curCellSpan==null ? 1 : parseInt(curCellSpan);
+        oTD.setAttribute("COLSPAN", curCellSpan + numOfSpan);
+        }
+    }
+
+function doRowSpan()
+    {
+    if(oTU.oTD==null)return;
+    var oTD = oTU.oTD
+    var oTable=GetElement(oTD,"TABLE")
+
+    selectedRow=oTD.innerHTML.split(",")[0]*1//asumsi:displayed=actual
+    selectedCol=oTD.innerHTML.split(",")[1]*1
+
+    var isFinish=false
+    for(var k=1;k<oTable.rows.length-(selectedRow);k++)
+        {
+        var isExist=false;
+        for(var i=0;i<oTable.rows[selectedRow+k].cells.length;i++)
+            {
+            if(oTable.rows[selectedRow+k].cells[i].innerHTML.split(",")[1]*1==selectedCol)
+                {
+                nActualToDelete=i;
+                isExist=true;
+                }
+            }
+        if(isExist)
+            {
+            if(!isFinish)
+                {
+                var curRowSpan = oTD.getAttribute("ROWSPAN")==null ? 1 : oTD.getAttribute("ROWSPAN");
+                var delRowSpan = oTable.rows[selectedRow+k].cells[nActualToDelete].getAttribute("ROWSPAN");
+                if (delRowSpan==null) delRowSpan = 1;
+                oTD.setAttribute("ROWSPAN", parseInt(curRowSpan) + parseInt(delRowSpan));
+                oTable.rows[selectedRow+k].deleteCell(nActualToDelete)
+                isFinish=true
+                }
+            }
+        }
+    }
+
+function doPreview()
+    {
+    var inpCollapse = document.getElementById("inpCollapse");
+    var inpCols = document.getElementById("inpCols");
+    var inpRows = document.getElementById("inpRows");
+    var inpBorder = document.getElementById("inpBorder");
+    var inpSpacing = document.getElementById("inpSpacing");
+    var inpPadding = document.getElementById("inpPadding");
+
+  var sCellSpacing="";
+  if(inpSpacing.value!="")sCellSpacing="cellspacing="+inpSpacing.value;
+  var sCellPadding="";
+  if(inpPadding.value!="")sCellPadding="cellpadding="+inpPadding.value;
+
+    if(inpCollapse.value=="Yes")
+        sTmp="BORDER-COLLAPSE: collapse"
+    else
+        sTmp="";
+    sHTML="<table id=idTable style='"+sTmp+";background-color:white' "+sCellSpacing+" "+sCellPadding+" width=100% height=100%>"
+
+    for(var i=0;i<inpRows.value;i++)
+        {
+        sHTML+="<tr>"
+        for(var j=0;j<inpCols.value;j++)
+            {
+            if(inpBorder.value==0)
+                sHTML+="<td style='border:black 1px dotted;padding:1px;cursor:default;' align=center onclick='tableClick(this)'>" + i + "," + j + "</td>";
+            else
+                sHTML+="<td style='border:black " + inpBorder.value + "px solid;padding:1px;cursor:default;' align=center onclick='tableClick(this)'>" + i + "," + j + "</td>";
+            }
+        sHTML+="</tr>"
+        }
+    sHTML+="</table>"
+    document.getElementById("idPreview").innerHTML=sHTML
+    }
+
+function doPreview2()
+    {
+    var inpCollapse = document.getElementById("inpCollapse");
+    var inpCols = document.getElementById("inpCols");
+    var inpRows = document.getElementById("inpRows");
+    var inpBorder = document.getElementById("inpBorder");
+    var inpSpacing = document.getElementById("inpSpacing");
+    var inpPadding = document.getElementById("inpPadding");
+
+    var oTable=document.getElementById("idTable");
+
+    if(inpCollapse.value=="Yes")
+        {
+            oTable.style.borderCollapse="";
+            oTable.style.borderCollapse="collapse";
+        } else {
+            oTable.style.borderCollapse="";
+        }
+
+    oTable.setAttribute("CELLSPACING", inpSpacing.value);
+    oTable.setAttribute("CELLPADDING", inpPadding.value);
+
+    for(var i=0;i<oTable.rows.length;i++)
+        {
+        oCurrTR=oTable.rows[i]
+        for(var j=0;j<oCurrTR.cells.length;j++)
+            {
+            oCurrTD=oCurrTR.cells[j];
+            if(inpBorder.value==0)
+                oCurrTD.style.border="black 1px dotted";
+            else
+                oCurrTD.style.border="black " + inpBorder.value + "px solid";
+            }
+        }
+
+    }
+
+function doInsert()
+    {
+
+    var idPreview = document.getElementById("idPreview");
+    var inpCollapse = document.getElementById("inpCollapse");
+    var inpBorder = document.getElementById("inpBorder");
+    var inpSpacing = document.getElementById("inpSpacing");
+    var inpPadding = document.getElementById("inpPadding");
+    var inpSummary = document.getElementById("inpSummary");
+    var inpCaption = document.getElementById("inpCaption");
+
+  var sCellSpacing="";
+  if(inpSpacing.value!="")sCellSpacing="cellspacing="+inpSpacing.value;
+  var sCellPadding="";
+  if(inpPadding.value!="")sCellPadding="cellpadding="+inpPadding.value;
+
+    parent.oUtil.obj.saveForUndo();
+
+    var oNodes=idPreview.childNodes[0].childNodes[0].childNodes
+
+    if(inpCollapse.value=="Yes")
+        sTmp="BORDER-COLLAPSE:collapse"
+    else
+        sTmp=""
+    sHTML="<table style='"+sTmp+";width:100%;' "+sCellSpacing+" "+sCellPadding+ (inpSummary.value==""?"":" summary=\"" + inpSummary.value + "\" ") + " selThis=\"selThis\">" //BORDER-COLLAPSE:collapse; cellpadding=0 cellspacing=0
+    if(inpCaption.value!="") sHTML+="<caption>"+inpCaption.value+"</caption>";
+
+    for(var i=0;i<oNodes.length;i++)
+        {
+        sHTML+="<tr>"
+        for(var j=0;j<oNodes[i].childNodes.length;j++)
+            {
+            nRowSpan=oNodes[i].childNodes[j].getAttribute("ROWSPAN");
+            nRowSpan=nRowSpan==null ? 1 : parseInt(nRowSpan);
+            nColSpan=oNodes[i].childNodes[j].getAttribute("COLSPAN");
+            nColSpan=nColSpan==null ? 1 : parseInt(nColSpan);
+            var sRowSpan=(nRowSpan>1 ? " rowspan="+nRowSpan+ " " : "");
+            var sColSpan=(nColSpan>1 ? " colspan="+nColSpan+ " " : "");
+            if(inpBorder.value==0)
+                sHTML+="<td "+sRowSpan+sColSpan+" style='vertical-align:top'>&nbsp;</td>";
+            else
+                sHTML+="<td style='border:black " + inpBorder.value + "px solid;vertical-align:top' "+sRowSpan+sColSpan+">&nbsp;</td>";
+            }
+        sHTML+="</tr>"
+        }
+    sHTML+="</table>"
+
+
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+    var range = oSel.getRangeAt(0);
+
+    var docFrag = range.createContextualFragment(sHTML);
+    range.deleteContents();
+    range.insertNode(docFrag);
+
+    var allTabs = oEditor.document.getElementsByTagName("TABLE");
+    for(var i=0; i<allTabs.length; i++) {
+        if (allTabs[i].getAttribute("selThis") == "selThis") {
+            oSel=oEditor.getSelection();
+            range = oEditor.document.createRange();
+            range.selectNode(allTabs[i]);
+            oSel.removeAllRanges();
+            oSel.addRange(range);
+            allTabs[i].removeAttribute("selThis");
+            break;
+        }
+    }
+
+    //*** RUNTIME BORDERS ***
+    //parent.oUtil.obj.runtimeBorder(false);
+    //***********************
+
+    parent.realTime(parent.oUtil.obj);
+    parent.oUtil.obj.selectElement(0);
+    }
+
+function bodyOnLoad()
+    {
+    document.getElementById("btnInsert").focus();
+    loadTxt();doPreview();
+    }
+
+</script>
+</head>
+<body style="overflow:hidden;">
+
+<table width=100% height="100%" align=center cellpadding=0 cellspacing=0>
+<tr>
+<td valign=top style="padding:7;padding-left:10;">
+
+    <table style="margin-bottom:4">
+    <tr>
+        <td><span id="txtLang" name="txtLang">Rows</span>:</td>
+        <td><input type="text" ID="inpRows" NAME="inpRows" size=3 value=2 onchange="doPreview()" class="inpTxt"></td>
+        <td>&nbsp;</td>
+        <td><span id="txtLang" name=txtLang>Spacing</span>:</td>
+        <td><select id="inpSpacing" name="inpSpacing" onchange="doPreview2()" class="inpSel">
+        <option value="" selected></option>
+                <option value=0>0px</option>
+                <option value=1>1px</option>
+                <option value=2>2px</option>
+                <option value=3>3px</option>
+                <option value=4>4px</option>
+                <option value=5>5px</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td><span id="txtLang" name="txtLang">Columns</span>:</td>
+        <td><input type="text" id="inpCols" name="inpCols" size=3 value=2 onchange="doPreview()" class="inpTxt"></td>
+        <td>&nbsp;</td>
+        <td><span id="txtLang" name="txtLang">Padding</span>:</td>
+        <td><select id="inpPadding" name="inpPadding" onchange="doPreview2()" class="inpSel">
+        <option value="" selected></option>
+                <option value=0>0px</option>
+                <option value=1>1px</option>
+                <option value=2>2px</option>
+                <option value=3>3px</option>
+                <option value=4>4px</option>
+                <option value=5>5px</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td><span id="txtLang" name="txtLang">Borders</span>:</td>
+        <td>
+            <select ID="inpBorder" NAME="inpBorder" onchange="doPreview2()" class="inpSel">
+                <option value=0 id="optLang" name="optLang" selected>No Border</option>
+                <option value=1>1px</option>
+                <option value=2>2px</option>
+                <option value=3>3px</option>
+                <option value=4>4px</option>
+                <option value=5>5px</option>
+            </select>
+        </td>
+        <td>-</td>
+        <td><span id="txtLang" name="txtLang">Collapse</span>:</td>
+        <td>
+            <select ID="inpCollapse" NAME="inpCollapse" onchange="doPreview2()" class="inpSel">
+                <option value="Yes" id="optLang" name="optLang">Yes</option>
+                <option value="No" id="optLang" name="optLang" selected>No</option>
+            </select>
+        </td>
+
+    </tr>
+    <tr>
+      <td><span id=txtLang name=txtLang>Caption</span>:</td>
+      <td colspan='4'><input type="text" id="inpCaption" name="inpCaption" size="40" value=""></td>
+    </tr>
+    <tr>
+      <td><span id=txtLang name=txtLang>Summary</span>:</td>
+      <td colspan='4'><input type="text" id="inpSummary" name="inpSummary" size="40" value=""></td>
+    </tr>
+    </table>
+
+
+    <table style="width:100%;height:140px;" cellpadding=0 cellspacing=0 border=0>
+
+    <tr>
+        <td style="background-color:ghostWhite; padding:5px;border:#999999 1px solid" height=100%>
+            <div id=idPreview style="overflow:auto;height:97px;padding:0"></div>
+        </td>
+    </tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr>
+        <td align=center>
+            <INPUT type="button" id="btnSpan2" name="btnSpan2" value="Span >" onclick="doColSpan()" unselectable=on style="width:90px;height:22px;" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+            <INPUT type="button" id="btnSpan1" name="btnSpan1" value="Span v" onclick="doRowSpan()" unselectable=on style="width:90px;height:22px;" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+        </td>
+    </tr>
+    </table>
+
+
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" style="padding-top:10px;" align="right">
+  <table cellpadding=0 cellspacing=0>
+  <tr>
+  <td>
+    <input type="button" name=btnCancel id=btnCancel value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+    <input type="button" name=btnInsert id=btnInsert value="insert" onclick="doInsert();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  </tr>
+  </table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

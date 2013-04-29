@@ -1,0 +1,38 @@
+<!DOCTYPE html> <html lang="en">
+<head>
+<meta charset="[+modx_charset+]" />
+<title>[+site_name+]</title>
+<link rel="stylesheet" type="text/css" href="[+ml_http_path+]style.css" />
+<script type="text/javascript" src="[+ml_http_path+]/login.js"></script>
+</head>
+<body>
+<table width="100%" height="85%" border="0" cellspacing="0" cellpadding="0" id="wrapper">
+	<tr>
+		<td>
+			<form method="post" action="processors/login.processor.php">
+				<div id="header">
+					<a href="/" id="site_name">[+site_name+]</a>
+				</div>
+				<div id="container">
+					<div class="input">
+						<label for="username">[+username+]:</label><input type="text" class="text" name="username" id="username" tabindex="1" value="[+uid+]" />
+					</div>
+					<div class="input">
+						<label for="password">[+password+]:</label><input type="password" class="text" name="password" id="password" tabindex="2" value="" />
+					</div>
+					<p class="caption">[+login_captcha_message+]</p>
+					<div>
+						[+captcha_image+]
+					</div>[+captcha_input+]
+					
+					<div class="clearfix control">
+						<input type="checkbox" id="rememberme" name="rememberme" tabindex="4" value="1" class="checkbox" />
+						<label for="rememberme" class="rememberme">[+remember_username+]</label> <input type="submit" class="login" id="submitButton" value="[+login_button+]" />
+					</div>
+				</div>
+			</form>
+		</td>
+	</tr>
+</table>
+</body>
+</html>

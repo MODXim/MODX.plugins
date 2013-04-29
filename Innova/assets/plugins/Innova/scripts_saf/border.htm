@@ -1,0 +1,440 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/border.js'></scr"+"ipt>");
+</script>
+<script language="JavaScript" src="color_picker.js"></script>
+<script>writeTitle()</script>
+<script>
+var dialogArgument=['parent', 'parent'];
+
+document.onclick=hideAll;
+function hideAll()
+    {
+    oColor1.hide();
+    }
+
+/*****************************
+    bodyOnLoad
+*****************************/
+function bodyOnLoad()
+    {
+    loadTxt();
+
+    oElement = eval(openerWin.dialogArgument[1]);
+
+    //Select Border Width
+    if(oElement.style.borderLeftWidth==oElement.style.borderTopWidth &&
+        oElement.style.borderLeftWidth==oElement.style.borderRightWidth &&
+        oElement.style.borderLeftWidth==oElement.style.borderBottomWidth)
+        {
+        sBorderWidth = oElement.style.borderLeftWidth;
+
+        var oNodes=document.getElementById("tblBorderWidth").childNodes[0].childNodes
+        for(var i=0;i<oNodes.length;i++)
+            {
+            oNodes[i].childNodes[0].style.backgroundColor='#ffffff';
+            oNodes[i].childNodes[0].style.border='#ffffff 1px solid';
+            }
+        if(document.getElementById("idWidth_"+sBorderWidth))
+            {
+            document.getElementById("idWidth_"+sBorderWidth).style.backgroundColor='#f1f1f1';
+            document.getElementById("idWidth_"+sBorderWidth).style.border='#718191 1px solid';
+            }
+        else
+            {
+            //alert("INFO: The border width size or unit is not available in the Width selection list.")
+            }
+        document.getElementById("idSelBorderWidth").value=sBorderWidth;
+        }
+
+    //Select Border Style
+    if(oElement.style.borderLeftStyle==oElement.style.borderTopStyle &&
+        oElement.style.borderLeftStyle==oElement.style.borderRightStyle &&
+        oElement.style.borderLeftStyle==oElement.style.borderBottomStyle)
+        {
+        var sBorderStyle = oElement.style.borderLeftStyle;
+
+
+        var oNodes=document.getElementById("tblBorderStyle").childNodes[0].childNodes
+        for(var i=0;i<oNodes.length;i++)
+            {
+            oNodes[i].childNodes[0].style.backgroundColor='#ffffff';
+            oNodes[i].childNodes[0].style.border='#ffffff 1px solid';
+            }
+        if(sBorderStyle!="")
+            {
+            document.getElementById("idStyle_"+sBorderStyle).parentNode.style.backgroundColor='#f1f1f1';
+            document.getElementById("idStyle_"+sBorderStyle).parentNode.style.border='#708090 1px solid';
+            document.getElementById("idSelBorderStyle").value=sBorderStyle;
+            }
+        else
+            {
+            //alert("INFO: ")
+            }
+        }
+
+    if(oElement.style.borderLeftColor==oElement.style.borderTopColor &&
+        oElement.style.borderLeftColor==oElement.style.borderRightColor &&
+        oElement.style.borderLeftColor==oElement.style.borderBottomColor)
+        {
+        sBorderColor = oElement.style.borderLeftColor;
+        }
+
+    //Select ApplyTo
+    var oNodes=document.getElementById("tblBorderApplyTo").childNodes[0].childNodes
+    for(var i=0;i<oNodes.length;i++)
+        {
+        oNodes[i].childNodes[0].style.backgroundColor='#ffffff';
+        oNodes[i].childNodes[0].style.border='#ffffff 1px solid';
+        }
+    if((oElement.style.borderLeftWidth.substring(0,1)!="0") &&
+        (oElement.style.borderTopWidth.substring(0,1)=="0") &&
+        (oElement.style.borderRightWidth.substring(0,1)=="0") &&
+        (oElement.style.borderBottomWidth.substring(0,1)=="0"))
+        {
+        //Left
+        document.getElementById("idApplyTo_Left").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_Left").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_Left";
+        }
+    if((oElement.style.borderLeftWidth.substring(0,1)=="0") &&
+        (oElement.style.borderTopWidth.substring(0,1)!="0") &&
+        (oElement.style.borderRightWidth.substring(0,1)=="0") &&
+        (oElement.style.borderBottomWidth.substring(0,1)=="0"))
+        {
+        //Top
+        document.getElementById("idApplyTo_Top").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_Top").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_Top";
+        }
+    if((oElement.style.borderLeftWidth.substring(0,1)=="0") &&
+        (oElement.style.borderTopWidth.substring(0,1)=="0") &&
+        (oElement.style.borderRightWidth.substring(0,1)!="0") &&
+        (oElement.style.borderBottomWidth.substring(0,1)=="0"))
+        {
+        //Right
+        document.getElementById("idApplyTo_Right").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_Right").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_Right";
+        }
+    if((oElement.style.borderLeftWidth.substring(0,1)=="0") &&
+        (oElement.style.borderTopWidth.substring(0,1)=="0") &&
+        (oElement.style.borderRightWidth.substring(0,1)=="0") &&
+        (oElement.style.borderBottomWidth.substring(0,1)!="0"))
+        {
+        //Bottom
+        document.getElementById("idApplyTo_Bottom").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_Bottom").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_Bottom";
+        }
+    if((oElement.style.borderLeftWidth.substring(0,1)!="0") &&
+        (oElement.style.borderTopWidth.substring(0,1)!="0") &&
+        (oElement.style.borderRightWidth.substring(0,1)!="0") &&
+        (oElement.style.borderBottomWidth.substring(0,1)!="0"))
+        {
+        //Outside
+        document.getElementById("idApplyTo_Outside").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_Outside").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_Outside";
+        }
+    if((oElement.style.borderLeftWidth=="medium") &&
+        (oElement.style.borderTopWidth=="medium") &&
+        (oElement.style.borderRightWidth=="medium") &&
+        (oElement.style.borderBottomWidth=="medium"))
+        {
+        //Width is not specified
+        document.getElementById("idApplyTo_Outside").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_Outside").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_Outside";
+        }
+    if((oElement.style.borderLeftWidth.substring(0,1)=="0") &&
+        (oElement.style.borderTopWidth.substring(0,1)=="0") &&
+        (oElement.style.borderRightWidth.substring(0,1)=="0") &&
+        (oElement.style.borderBottomWidth.substring(0,1)=="0"))
+        {
+        //None
+        document.getElementById("idApplyTo_None").style.backgroundColor='#f1f1f1';
+        document.getElementById("idApplyTo_None").style.border='#718191 1px solid';
+        document.getElementById("idSelBorderApplyTo").value="idApplyTo_None";
+        }
+
+    //Select Border Color
+    document.getElementById("idSelBorderColor").style.backgroundColor=oElement.style.borderLeftColor;
+    oColor1.color=oElement.style.borderLeftColor;
+    }
+
+/*****************************
+    APPLY
+*****************************/
+function doApply()
+    {
+    oElement = eval(openerWin.dialogArgument[1]);
+    doApplyBorder(oElement);
+    self.close();
+    }
+
+function doApplyBorder(oElement)
+    {
+    sStyle=document.getElementById("idSelBorderStyle").value;
+    sWidth=document.getElementById("idSelBorderWidth").value;
+    sApplyTo=document.getElementById("idSelBorderApplyTo").value;
+    sColor=document.getElementById("idSelBorderColor").style.backgroundColor;
+
+    switch(sApplyTo)
+        {
+        case "idApplyTo_None":
+            oElement.style.border="none";
+            break;
+        case "idApplyTo_Outside":
+            oElement.style.border = sColor + " " + sWidth + " " + sStyle;
+            //oElement.style.borderColor = sColor;
+            //oElement.style.borderWidth = sWidth;
+            //oElement.style.borderStyle = sStyle;
+            break;
+        case "idApplyTo_Left":
+            oElement.style.borderLeft = sColor + " " + sWidth + " " + sStyle;
+            //oElement.style.borderLeftColor = sColor;
+            //oElement.style.borderLeftWidth = sWidth;
+            //oElement.style.borderLeftStyle = sStyle;
+            break;
+        case "idApplyTo_Top":
+            oElement.style.borderTop = sColor + " " + sWidth + " " + sStyle;
+            //oElement.style.borderTopColor = sColor;
+            //oElement.style.borderTopWidth = sWidth;
+            //oElement.style.borderTopStyle = sStyle;
+            break;
+        case "idApplyTo_Right":
+            oElement.style.borderRight = sColor + " " + sWidth + " " + sStyle;
+            //oElement.style.borderRightColor = sColor;
+            //oElement.style.borderRightWidth = sWidth;
+            //oElement.style.borderRightStyle = sStyle;
+            break;
+        case "idApplyTo_Bottom":
+            oElement.style.borderBottom = sColor + " " + sWidth + " " + sStyle;
+            //oElement.style.borderBottomColor = sColor;
+            //oElement.style.borderBottomWidth = sWidth;
+            //oElement.style.borderBottomStyle = sStyle;
+            break;
+        }
+    }
+
+/*****************************
+    Mouse Over/Out
+*****************************/
+
+function doOver(me)
+    {
+    if(extractRGBColor(me.style.backgroundColor)!='f1f1f1')
+        {
+        me.style.backgroundColor='#f0f0f0';
+        me.style.border='#708090 1px solid';
+        }
+    }
+function doOut(me)
+    {
+    if(extractRGBColor(me.style.backgroundColor)!='f1f1f1')
+        {
+        me.style.backgroundColor='#ffffff';
+        me.style.border='#ffffff 1px solid';
+        }
+    }
+
+/*****************************
+    Border Style
+*****************************/
+function drawBorderStyleSelection(idSelected)
+    {
+    arrStyleOptions=[   ["idStyle_none","border:none;height:10px;",getTxt("No Border")],
+                        ["idStyle_solid","border-bottom:black 1px solid;height:10px;",""],
+                        ["idStyle_dotted","border-bottom:black dotted;height:10px",""],
+                        ["idStyle_dashed","border-bottom:black dashed;height:10px",""],
+                        ["idStyle_double","border-bottom:black double;height:10px",""],
+                        ["idStyle_groove","border-style:groove;height:18px",""],
+                        ["idStyle_ridge","border-style:ridge;height:18px",""],
+                        ["idStyle_inset","border-style:inset;height:18px",""],
+                        ["idStyle_outset","border-style:outset;height:18px",""]];//[ID,CssText,Caption)
+    sHTML="<div style='overflow:auto;border:gray 1px solid;width:125px;height:127px;'>"
+    sHTML+="<table id=tblBorderStyle cellpadding=0 cellspacing=0 width=100% style='table-layout:fixed;background:white'>"
+    for(var i=0;i<arrStyleOptions.length;i++)
+        {
+        sHTML+="<tr>"
+        sHTML+="<td valign=top onclick=\"doSelectBorderStyle(this)\" style=\"cursor:default;height:25px;padding:4px;border:white 1px solid;\" onmouseover=\"doOver(this);\" onmouseout=\"doOut(this);\">"
+        sHTML+="    <table id="+arrStyleOptions[i][0]+" name="+arrStyleOptions[i][0]+" style='"+arrStyleOptions[i][1]+"' width=100%><tr><td>"+arrStyleOptions[i][2]+"</td></tr></table>"
+        sHTML+="</td>"
+        sHTML+="</tr>"
+        }
+    sHTML+="</table><input type=hidden name=idSelBorderStyle id=idSelBorderStyle>"
+    sHTML+="</div>"
+    document.write(sHTML)
+    }
+
+function doSelectBorderStyle(me)
+    {
+    oNodes=document.getElementById("tblBorderStyle").childNodes[0].childNodes
+    for(var i=0;i<oNodes.length;i++)
+        {
+        oNodes[i].childNodes[0].style.backgroundColor='#ffffff';
+        oNodes[i].childNodes[0].style.border='#ffffff 1px solid';
+        }
+    me.style.backgroundColor='#f1f1f1';
+    me.style.border='#708090 1px solid';
+    document.getElementById("idSelBorderStyle").value=me.childNodes[1].style.borderBottomStyle;
+    }
+
+/*****************************
+    Border Width
+*****************************/
+function drawBorderWidthSelection()
+    {
+    arrWidthOptions=[["idWidth_1px","border-bottom:black 1px solid;height:16px;","1px"],
+                     ["idWidth_2px","border-bottom:black 2px solid;height:16px;","2px"],
+                     ["idWidth_3px","border-bottom:black 3px solid;height:16px;","3px"],
+                     ["idWidth_4px","border-bottom:black 4px solid;height:16px;","4px"],
+                     ["idWidth_5px","border-bottom:black 5px solid;height:16px;","5px"],
+                     ["idWidth_6px","border-bottom:black 6px solid;height:16px;","6px"],
+                     ["idWidth_7px","border-bottom:black 7px solid;height:16px;","7px"]];
+    sHTML="<div style='overflow:auto;border:gray 1px solid;width:125px;height:127px'>"
+    sHTML+="<table id=tblBorderWidth cellpadding=0 cellspacing=0 width=100% style='table-layout:fixed;background:white'>"
+    for(var i=0;i<arrWidthOptions.length;i++)
+        {
+        sHTML+="<tr>"
+        sHTML+="<td id="+arrWidthOptions[i][0]+" name="+arrWidthOptions[i][0]+" style=\"height:25px;padding:1px;border:white 1px solid;\" onclick=\"doSelectBorderWidth(this)\" onmouseover=\"doOver(this);\" onmouseout=\"doOut(this);\">"
+        sHTML+="    <table width=100%><tr><td style=\"height:25\" >"+arrWidthOptions[i][2]+"</td><td valign=top width=100%><table style='"+arrWidthOptions[i][1]+"' width=100%><tr><td></td></tr></table></td></tr></table>"
+        sHTML+="</td>"
+        sHTML+="</tr>"
+        }
+    sHTML+="</table><input type=hidden name=idSelBorderWidth id=idSelBorderWidth>"
+    sHTML+="</div>"
+    document.write(sHTML)
+    }
+function doSelectBorderWidth(me)
+    {
+    oNodes=document.getElementById("tblBorderWidth").childNodes[0].childNodes
+    for(var i=0;i<oNodes.length;i++)
+        {
+        oNodes[i].childNodes[0].style.backgroundColor='#ffffff';
+        oNodes[i].childNodes[0].style.border='#ffffff 1px solid';
+        }
+    me.style.backgroundColor='#f1f1f1';
+    me.style.border='#718191 1px solid';
+    document.getElementById("idSelBorderWidth").value=me.childNodes[1].childNodes[0].childNodes[0].childNodes[1].childNodes[0].style.borderBottomWidth;
+    //me.childNodes(0).childNodes(0).childNodes(0).childNodes(1).childNodes(0).style.borderBottomWidth;
+
+    }
+
+/*****************************
+    Border Apply To
+*****************************/
+function drawBorderApplyToSelection()
+    {
+    arrApplyToOptions=[ ["idApplyTo_None","../border/border_none.gif",getTxt("No Border")],
+                        ["idApplyTo_Outside","../border/border_outside.gif",getTxt("Outside Border")],
+                        ["idApplyTo_Left","../border/border_left.gif",getTxt("Left Border")],
+                        ["idApplyTo_Top","../border/border_top.gif",getTxt("Top Border")],
+                        ["idApplyTo_Right","../border/border_right.gif",getTxt("Right Border")],
+                        ["idApplyTo_Bottom","../border/border_bottom.gif",getTxt("Bottom Border")]];
+    sHTML="<div style='overflow:auto;border:gray 1px solid;width:60px;height:127px'>"
+    sHTML+="<table id=tblBorderApplyTo cellpadding=0 cellspacing=0 width=100% style='table-layout:fixed;background:white'>"
+    for(var i=0;i<arrApplyToOptions.length;i++)
+        {
+        sHTML+="<tr>"
+        sHTML+="<td id="+arrApplyToOptions[i][0]+" name="+arrApplyToOptions[i][0]+" valign=top style=\"height:30px;padding:4px;border:white 1px solid;\" onclick=\"doSelectBorderApplyTo(this)\" onmouseover=\"doOver(this);\" onmouseout=\"doOut(this);\">"
+        sHTML+="    <img src='"+arrApplyToOptions[i][1]+"' alt='"+arrApplyToOptions[i][2]+"'>"
+        sHTML+="</td>"
+        sHTML+="</tr>"
+        }
+    sHTML+="</table><input type=hidden name=idSelBorderApplyTo id=idSelBorderApplyTo>"
+    sHTML+="</div>"
+
+    document.write(sHTML)
+    }
+function doSelectBorderApplyTo(me)
+    {
+    oNodes=document.getElementById("tblBorderApplyTo").childNodes[0].childNodes
+    for(var i=0;i<oNodes.length;i++)
+        {
+        oNodes[i].childNodes[0].style.backgroundColor='#ffffff';
+        oNodes[i].childNodes[0].style.border='#ffffff 1px solid';
+        }
+    me.style.backgroundColor='#f1f1f1';
+    me.style.border='#718191 1px solid';
+    document.getElementById("idSelBorderApplyTo").value=me.id;
+    }
+</script>
+</head>
+
+<body style="overflow:hidden;">
+
+<table width=100% height=100% align=center cellpadding=0 cellspacing=0>
+<tr>
+<td valign=top style="padding:5px;height:100%">
+
+    <table>
+    <tr>
+    <td valign=top style="padding:3px">
+        <script>
+        drawBorderStyleSelection()
+        </script>
+    </td>
+    <td valign=top style="padding:3px">
+        <script>
+        drawBorderWidthSelection()
+        </script>
+    </td>
+    <td valign=top style="padding:3px" nowrap>
+        <script>
+        drawBorderApplyToSelection()
+        </script>
+    </td>
+    <td valign=top style="padding:3px" nowrap>
+        &nbsp;
+    </td>
+    <td valign=top style="padding:3px" nowrap>
+        <div><span id="txtLang" name="txtLang">Color</span>:</div>
+
+        <script>
+        document.write("<span style='background:white;width:20px'>");
+        document.write("    <span id='idSelBorderColor' style='border:gray 1px solid;width:20px;margin-right:3;'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>");
+        document.write("</span>");
+        document.write("<input type=button value='" + getTxt("Pick") + "' onclick=\"oColor1.show(this);event.cancelBubble=true;\" />");
+
+        var oColor1 = new ColorPicker("oColor1");
+        oColor1.onPickColor = new Function("document.getElementById('idSelBorderColor').style.backgroundColor=oColor1.color;");
+        oColor1.onRemoveColor = new Function("document.getElementById('idSelBorderColor').style.backgroundColor='';");
+        oColor1.align="right";
+        oColor1.txtCustomColors=getTxt("Custom Colors");
+        oColor1.txtMoreColors=getTxt("More Colors...");
+        oColor1.url = parent.oUtil.obj.scriptPath + "color_picker.htm";
+        oColor1.RENDER();
+        </script>
+
+    </td>
+    </tr>
+    </table>
+
+
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" align="right">
+  <table cellpadding="1" cellspacing="0">
+    <tr>
+    <td>
+      <input type="button" name=btnCancel id=btnCancel value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    <td>
+      <input type="button" name=btnOk id=btnOk value=" ok " onclick="doApply()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    </tr>
+  </table>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,248 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/styles_cssText.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+function doWindowFocus()
+    {
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+    }
+
+function bodyOnLoad()
+    {
+    loadTxt();
+
+    var idPreview = document.getElementById("idPreview").contentWindow;
+
+    window.onfocus=doWindowFocus;
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+
+    var obj=parent.oUtil.obj;
+
+    arrStyle = obj.arrStyle;
+    var sStyle=""
+    for(var i=0;i<arrStyle.length;i++)
+        {
+        sStyle+=arrStyle[i][0]+"{"+ arrStyle[i][3]+"}"+ "\n"
+        }
+
+    var sHTML="<HTML><HEAD><STYLE>"+sStyle+"</STYLE></HEAD><BODY margin-left=0 margin-top=0 margin-right=0 margin-bottom=0' id=idPreviewTarget></BODY></HTML>"
+    var oDoc=idPreview.document.open("text/html", "replace");
+    if(obj.publishingPath!="") oDoc.write("<BASE HREF=\""+obj.publishingPath+"\"/>" + sHTML);
+    else oDoc.write(sHTML);
+    oDoc.close();
+
+    realTime()
+    }
+
+function bodyOnUnload()
+  {
+  parent.oUtil.onSelectionChanged=null;
+  }
+
+function realTime()
+    {
+    var idPreview = document.getElementById("idPreview").contentWindow;
+    var inpCssText = document.getElementById("inpCssText");
+    var inpClassName = document.getElementById("inpClassName");
+
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+    var isTextSel = parent.isTextSelected(oSel);
+
+    var oElement;
+    if(parent.oUtil.activeElement)
+        oElement=parent.oUtil.activeElement
+    else
+        oElement = parent.getSelectedElement(oSel);
+
+    var tagName=oElement.nodeName;
+
+    if(tagName=="TD")
+        idPreview.document.getElementById("idPreviewTarget").innerHTML="<table caption='styles_cssText_internal_use'><tr>" + parent.getOuterHTML(oElement) + "</tr></table>"
+    else
+        idPreview.document.getElementById("idPreviewTarget").innerHTML=parent.getOuterHTML(oElement);
+
+    inpCssText.value=oElement.style.cssText
+    inpClassName.value=oElement.className;
+    }
+
+function doApply()
+    {
+
+    var idPreview = document.getElementById("idPreview").contentWindow;
+    var inpCssText = document.getElementById("inpCssText");
+    var inpClassName = document.getElementById("inpClassName");
+
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+
+    var obj=parent.oUtil.obj;
+
+    parent.oUtil.obj.saveForUndo();
+
+    var oElement;
+    if(inpCssText.value=="" && inpClassName.value=="")//Selalu berarti me-remove style & class di CURRENT TAG!
+        {
+        oElement = parent.getSelectedElement(oSel);
+        if(oElement)
+            {
+            if(oElement.tagName!="BODY")
+                {
+                oElement.removeAttribute("style");
+                oElement.removeAttribute("class");
+
+                if(oElement.tagName=="FONT" && oElement.color=="" && oElement.face=="" && oElement.size=="" && oElement.id=="")
+                    obj.doCmd('RemoveFormat');
+                }
+            else
+                {
+                alert(getTxt("You're selecting BODY element."));
+                return;
+                }
+            }
+        }
+    else if(parent.oUtil.activeElement)
+        {
+        oElement=parent.oUtil.activeElement
+    if(oElement)
+      {
+            if(inpCssText.value=="") oElement.removeAttribute("style");
+            else oElement.style.cssText=inpCssText.value;
+
+            if(inpClassName.value=="") oElement.removeAttribute("class");
+            else oElement.className=inpClassName.value;
+      }
+        }
+    else
+        {
+    oElement=parent.getSelectedElement(oSel);
+    if (parent.isTextSelected(oSel))
+      {
+      if(oSel!="")
+        {
+        var idNewSpan=obj.applySpan();
+        if(idNewSpan)//if there is selected text
+          {
+          if(inpCssText.value=="") idNewSpan.removeAttribute("style");//jadi kalo CSS Text input dibuat empty, tetap akan melakukan remove
+          else idNewSpan.style.cssText=inpCssText.value;
+
+          if(inpClassName.value=="") idNewSpan.removeAttribute("class");
+          else idNewSpan.className=inpClassName.value;
+          }
+        }
+      else
+        {
+        if(oElement)
+        if(oElement.tagName!="BODY")
+          {
+          if(inpCssText.value=="") oElement.removeAttribute("style");
+          else oElement.style.cssText=inpCssText.value;
+
+          if(inpClassName.value=="") oElement.removeAttribute("class");
+          else oElement.className=inpClassName.value;
+          }
+        }
+      }
+    else
+      {
+      if(oElement)
+      if(oElement.tagName!="BODY")
+        {
+        if(inpCssText.value=="") oElement.removeAttribute("style");
+        else oElement.style.cssText=inpCssText.value;
+
+        if(inpClassName.value=="") oElement.removeAttribute("class");
+        else oElement.className=inpClassName.value;
+        }
+      }
+        }
+
+    realTime()
+    }
+
+function doCssTextChange()
+    {
+
+    var idPreview = document.getElementById("idPreview").contentWindow;
+    var inpCssText = document.getElementById("inpCssText");
+    var inpClassName = document.getElementById("inpClassName");
+
+    if(idPreview.document.getElementById("idPreviewTarget").innerHTML.substring(0,1)=="<")//means there is a tag for the style to be applied. Kalau tdk ada berarti BODY.
+        {
+        if(idPreview.document.getElementById("idPreviewTarget").innerHTML.substring(0,6)=="<TABLE")
+            {
+            if(idPreview.document.getElementById("idPreviewTarget").childNodes[0].caption=="styles_cssText_internal_use")
+                {//kalau yg di select text dalam table cell (TD)
+                idPreview.document.getElementById("idPreviewTarget").childNodes[0].childNodes[0].childNodes[0].childNodes[0].style.cssText=inpCssText.value;
+                idPreview.document.getElementById("idPreviewTarget").childNodes[0].childNodes[0].childNodes[0].childNodes[0].className=inpClassName.value;
+                }
+            else
+                {//kalau yg di select TABLE
+                idPreview.document.getElementById("idPreviewTarget").childNodes[0].style.cssText=inpCssText.value;
+                idPreview.document.getElementById("idPreviewTarget").childNodes[0].className=inpClassName.value;
+                }
+            }
+        else
+            {
+            idPreview.document.getElementById("idPreviewTarget").childNodes[0].style.cssText=inpCssText.value;
+            idPreview.document.getElementById("idPreviewTarget").childNodes[0].className=inpClassName.value;
+            }
+        }
+    //else => BODY
+    //  idPreview.document.all.idPreviewTarget.style.cssText=inpCssText.value;
+    }
+</script>
+</head>
+<body style="overflow:hidden;">
+
+<table width=100% height=100% align=center cellpadding=0 cellspacing=0>
+<tr>
+<td valign=top style="padding:5px;height:100%">
+    <table width=100%>
+    <tr>
+    <td nowrap>
+        <div style='font-family:Verdana;font-size:10px;padding-bottom:3'><b><span id=txtLang name=txtLang>CSS Text</span>:</b></div>
+        <textarea rows=8 style="width:100%;" id="inpCssText" name="inpCssText" onblur="doCssTextChange()" style="font-family:vardana;font-size:10px" class="inpTxt"></textarea>
+    </td>
+    </tr>
+    <tr>
+    <td nowrap>
+        <span style='font-family:Verdana;font-size:10px;'><b><span id=txtLang name=txtLang>Class Name</span>:</b></span>
+        <input type="text" name="inpClassName" id="inpClassName" onblur="doCssTextChange()" style="width:225" class="inpTxt">
+    </td>
+    </tr>
+    <tr>
+    <td nowrap style="padding-top:5px;padding-bottom:5px">
+        <iframe style="width:100%;height:75px;border:#d3d3d3 1px solid;background-color:#ffffff" name=idPreview id=idPreview></iframe>
+    </td>
+    </tr>
+    </table>
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" style="padding-top:10px;" align="right">
+  <table cellpadding=0 cellspacing=0>
+  <tr>
+  <td>
+    <input type="button" name=btnCancel id=btnCancel value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+    <input type="button" name=btnApply id=btnApply value="apply" onclick="doApply();window.focus();" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+    <input type="button" name=btnOk id=btnOk value=" ok " onclick="doApply();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  </tr>
+  </table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

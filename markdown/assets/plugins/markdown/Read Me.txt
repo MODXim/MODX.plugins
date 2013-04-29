@@ -1,0 +1,33 @@
+** Markdown Plugin for MODx **
+
+"by" Guillaume Grenier (I just changed 2 or 3 things...)
+A rip-off of the Textile plugin by Raymond Irving
+
+Updated to Markdown Extra 1.1.7 by Thomas Steinberg
+
+Uses the PHP Markdown Extra parser by Michel Fortin
+<http://www.michelf.com/projects/php-markdown/>
+Markdown is by John Gruber
+<http://daringfireball.net/projects/markdown/>
+
+
+* How to install *
+
+1. Upload the "markdown.php" file (which is in the "PHP Markdown Extra 1.0.1" folder) in your plugins directory (/assets/plugins/)
+2. Open the "plugin.markdown.tpl" file and copy all its contents.
+3. Create a new plugin in the Manager (Resources > Manage Resources > Plugins >> New plugin).
+4. Paste the code in the source field.
+5. In the "System Events" tab, enable the "OnWebPagePrerender" Template Service Event.
+6. Save your work.
+
+
+* How to use *
+
+- Make sure WYSIWYG editors (such as FCKEditor) are disabled.
+- Enclose all your Markdown stuff inside <markdown> </markdown> tags. (You can put these tags in a template to simplify the process.)
+- That's it!
+
+
+* Markdown Extra Syntax *
+
+<http://michelf.com/projects/php-markdown/extra/>

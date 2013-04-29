@@ -1,0 +1,32 @@
+InnovaStudio WYSIWYG Editor 5.1
+Copyright © 2010, INNOVA STUDIO (www.InnovaStudio.com). All rights reserved.
+____________________________________________________________________
+
+LICENSE AGREEMENT 
+
+
+ONE LICENSE REQUIRED PER DEVELOPER
+
+Use of InnovaStudio WYSIWYG Editor (SOURCE CODE) requires one license per developer. Licenses are non-transferable between developers. 
+
+ROYALTY FREE DISTRIBUTION
+
+1. InnovaStudio.com grants you, the licensed developer, the right to use InnovaStudio WYSIWYG Editor, customize to her/his needs and requirements and distribute InnovaStudio WYSIWYG Editor in a commercial application, without any royalty whatsoever, provided that : 
+
+    - You do not distribute InnovaStudio WYSIWYG Editor, in whole or in part, in any form that does not add primary and substantial value to the SOURCE CODE, and that this resulting product must not compete with InnovaStudio WYSIWYG Editor on the market level. 
+    - You do not permit (either by explicit or implicit means) further distribution of the InnovaStudio WYSIWYG Editor by your end users. 
+
+2. As a result of point 1, if you add some features into InnovaStudio WYSIWYG Editor and sell it as upgraded product, it is not allowed, since, in essence, the product offers the same purpose, and it may actually compete with our product. Also, migrating InnovaStudio WYSIWYG Editor to another server platform that at the end resulting the same product with the same functions or translating InnovaStudio WYSIWYG Editor to use another languages can not be considered that you have added a substantial value to the SOURCE CODE. You must include InnovaStudio WYSIWYG Editor into your product / project as a supporting function / add-on facility, and it is not the main / core functionality of InnovaStudio WYSIWYG Editor that your product offers. 
+
+3. As a result of point 1, you do not distribute InnovaStudio WYSIWYG Editor in free and/or Open Source projects/applications.
+
+4. A single license provides for unlimited distribution of a single application that provides InnovaStudio WYSIWYG Editor functionality. Additional licenses must be purchased for royalty free distribution of any additional applications. 
+
+LIMITED WARRANTY 
+
+Although InnovaStudio.com has tested this SOURCE CODE and reviewed the documentation, InnovaStudio.com makes no warranty or representation, either expressed or implied, with respect to this SOURCE CODE, its quality, performance, merchantability, or fitness for a particular purpose. As a result, InnovaStudio WYSIWYG Editor is licensed AS-IS, and you are assuming the entire risk as to its quality and performance. 
+
+InnovaStudio.com shall not be liable for any claim or right to recover damages, including, but not limited to, loss of profit, data, or use of the software or special, incidental, or consequential damages, or other similar claims, even if InnovaStudio.com has been specifically advised of the possibility of such damages. 
+
+____________________________________________________________________
+http://www.InnovaStudio.com

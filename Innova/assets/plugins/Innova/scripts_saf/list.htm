@@ -1,0 +1,679 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<style>
+.box{cursor:default;border:#9B95A6 1px solid;width:40px;background:white;}
+</style>
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/list.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+
+function tabClick(n)
+    {
+    var tab1 = document.getElementById("tab1");
+    var tab2 = document.getElementById("tab2");
+
+    var divNumbered = document.getElementById("divNumbered");
+    var divBulleted = document.getElementById("divBulleted");
+
+    tab1.removeAttribute("style");
+    tab2.removeAttribute("style");
+
+    tab1.style.cursor  = "pointer";
+    tab1.style.padding = "6px";
+    tab2.style.cursor  = "pointer";
+    tab2.style.padding = "6px";
+    switch(n)
+        {
+        case 1:
+            tab1.style.border="#e5e5e5 1px solid";
+            tab1.style.borderBottom="none";
+            tab1.style.background="#ffffff";
+            tab1.style.cursor="";
+
+            tab2.style.border="#e5e5e5 1px solid";
+            tab2.style.borderLeft="none";
+            tab2.style.background="#e5e5e5";
+            tab2.style.cursor="hand";
+
+            divNumbered.style.display="block"
+            divBulleted.style.display="none"
+
+            break;
+        case 2:
+            tab1.style.border="#e5e5e5 1px solid";
+            tab1.style.borderRight="none";
+            tab1.style.background="#e5e5e5";
+            tab1.style.cursor="hand";
+
+            tab2.style.border="#e5e5e5 1px solid";
+            tab2.style.borderBottom="none";
+            tab2.style.background="#ffffff";
+            tab2.style.cursor="";
+
+            divNumbered.style.display="none"
+            divBulleted.style.display="block"
+
+            break;
+        }
+    }
+
+function GetElement(oElement,sMatchTag)
+    {
+    while (oElement!=null&&oElement.tagName!=sMatchTag)
+        {
+        if(oElement.tagName=="BODY")return null;
+        oElement=oElement.parentNode;
+        }
+    return oElement;
+    }
+
+function doWindowFocus()
+    {
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+    }
+
+function bodyOnLoad()
+    {
+    loadTxt();
+
+    tabClick(1);
+    window.onfocus=doWindowFocus;
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+
+    if(parent.oUtil.obj.cmdAssetManager!="")
+        document.getElementById("btnAsset").style.display="block";
+
+    realTime()
+    }
+
+function bodyOnUnload()
+  {
+  parent.oUtil.onSelectionChanged=null;
+  }
+
+function openAsset()
+    {
+    eval(parent.oUtil.obj.cmdAssetManager);
+    }
+
+function setAssetValue(v)
+    {
+    document.getElementById("inpImgURL").value = v;
+    }
+
+function modalDialogShow(url,width,height)
+    {
+    parent.modalDialogShow(url,width,height, window);
+    }
+
+function realTime()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+
+    var oElement = parent.getSelectedElement(oSel);
+    while (oElement!=null && oElement.nodeName!="UL" && oElement.nodeName!="OL")
+        {
+        if(oElement.nodeName=="BODY") return;
+        oElement=oElement.parentNode;
+        }
+
+    var range = oEditor.document.createRange();
+    range.selectNode(oElement);
+    oSel = oEditor.getSelection();
+    oSel.removeAllRanges();
+    oSel.addRange(range);
+
+    var box1 = document.getElementById("box1");
+    var box2 = document.getElementById("box2");
+    var box3 = document.getElementById("box3");
+    var box4 = document.getElementById("box4");
+    var box5 = document.getElementById("box5");
+    var box6 = document.getElementById("box6");
+    var box7 = document.getElementById("box7");
+    var box8 = document.getElementById("box8");
+
+    var inpStarting = document.getElementById("inpStarting");
+    var inpLeftMargin1 = document.getElementById("inpLeftMargin1");
+    var inpLeftMargin2 = document.getElementById("inpLeftMargin2");
+    var inpImgURL = document.getElementById("inpImgURL");
+
+    if(oElement.nodeName=="OL")
+        {
+        tabClick(1);
+        if(oElement.type==""||oElement.type=="1")doClick1(box1);
+        if(oElement.type=="A")doClick1(box2);
+        if(oElement.type=="a")doClick1(box3);
+        if(oElement.type=="I")doClick1(box4);
+        if(oElement.type=="i")doClick1(box5);
+        }
+    if(oElement.nodeName=="UL")
+        {
+        tabClick(2);
+        if(oElement.type==""||oElement.type=="disc")doClick1(box6);
+        if(oElement.type=="circle")doClick1(box7);
+        if(oElement.type=="square")doClick1(box8);
+        }
+    if(oElement.start && oElement.start != -1)
+        inpStarting.value=oElement.start;
+    else
+        inpStarting.value="";
+
+    if(oElement.style.marginLeft=="")
+        {
+        inpLeftMargin1.value="";
+        inpLeftMargin2.value="";
+        }
+    else
+        {
+        inpLeftMargin1.value=oElement.style.marginLeft;
+        inpLeftMargin2.value=oElement.style.marginLeft;
+        }
+
+    //list-style-image
+    if(oElement.style.listStyleImage=="")
+        {
+        inpImgURL.value=""
+        }
+    else
+        {
+        s=oElement.style.listStyleImage;
+        s=s.substring(4,s.length-1);
+        inpImgURL.value=s;
+        }
+    }
+
+function setLeftMargin1(oEl)
+    {
+    var inpLeftMargin1 = document.getElementById("inpLeftMargin1");
+
+    if(inpLeftMargin1.value!="")
+        oEl.style.marginLeft=inpLeftMargin1.value;
+    else
+        oEl.style.marginLeft="";
+    }
+
+function setLeftMargin2(oEl)
+    {
+    var inpLeftMargin2 = document.getElementById("inpLeftMargin2");
+
+    if(inpLeftMargin2.value!="")
+        oEl.style.marginLeft=inpLeftMargin2.value;
+    else
+        oEl.style.marginLeft="";
+    }
+
+function doApply()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+  var obj=parent.oUtil.obj;
+    obj.saveForUndo();
+
+    var box1 = document.getElementById("box1");
+    var box2 = document.getElementById("box2");
+    var box3 = document.getElementById("box3");
+    var box4 = document.getElementById("box4");
+    var box5 = document.getElementById("box5");
+    var box6 = document.getElementById("box6");
+    var box7 = document.getElementById("box7");
+    var box8 = document.getElementById("box8");
+
+  var bBox1=false;var bBox2=false;var bBox3=false;var bBox4=false;
+  var bBox5=false;var bBox6=false;var bBox7=false;var bBox8=false;
+  if(box1.getAttribute("selThis")=="selThis")bBox1=true;
+  if(box2.getAttribute("selThis")=="selThis")bBox2=true;
+  if(box3.getAttribute("selThis")=="selThis")bBox3=true;
+  if(box4.getAttribute("selThis")=="selThis")bBox4=true;
+  if(box5.getAttribute("selThis")=="selThis")bBox5=true;
+  if(box6.getAttribute("selThis")=="selThis")bBox6=true;
+  if(box7.getAttribute("selThis")=="selThis")bBox7=true;
+  if(box8.getAttribute("selThis")=="selThis")bBox8=true;
+
+    var inpStarting = document.getElementById("inpStarting");
+    var inpLeftMargin1 = document.getElementById("inpLeftMargin1");
+    var inpLeftMargin2 = document.getElementById("inpLeftMargin2");
+    var inpImgURL = document.getElementById("inpImgURL");
+
+    var oElement = parent.getSelectedElement(oSel);
+    while (oElement!=null && oElement.nodeName!="UL" && oElement.nodeName!="OL")
+        {
+        if(oElement.nodeName=="BODY")obj.doCmd("InsertUnOrderedList");
+        oElement=oElement.parentNode;
+        }
+
+    var oElement = parent.getSelectedElement(oSel);
+    while (oElement!=null && oElement.nodeName!="UL" && oElement.nodeName!="OL")
+        {
+        if(oElement.nodeName=="BODY")return
+        oElement=oElement.parentNode;
+        }
+
+    oElement.removeAttribute("type");
+    oElement.removeAttribute("start");
+
+    //list-style-image
+    if(inpImgURL.value!="")
+        {
+        oElement.style.listStyleImage="url('"+inpImgURL.value+"')";
+        setLeftMargin2(oElement);
+
+        if(bBox6)oElement.type="disc";
+        if(bBox7)oElement.type="circle";
+        if(bBox8)oElement.type="square";
+
+        if(oElement.tagName=="OL")
+            obj.doCmd("InsertUnOrderedList");
+        return;
+        }
+    else
+        {
+        oElement.style.listStyleImage="";
+        }
+
+    if(inpStarting.value=="")
+        nStart=1;
+    else
+        nStart=inpStarting.value;
+
+    if(bBox1)
+        {
+        if(oElement.tagName=="UL")obj.doCmd("InsertOrderedList");
+        oElement = parent.getSelectedElement(oSel);
+
+        oElement.type="1";
+        oElement.start=nStart;
+        setLeftMargin1(oElement);
+        }
+    if(bBox2)
+        {
+        if(oElement.tagName=="UL")obj.doCmd("InsertOrderedList");
+        oElement = parent.getSelectedElement(oSel);
+
+        oElement.type="A";
+        oElement.start=nStart;
+        setLeftMargin1(oElement);
+        }
+    if(bBox3)
+        {
+        if(oElement.tagName=="UL")obj.doCmd("InsertOrderedList");
+        oElement = parent.getSelectedElement(oSel);
+
+        oElement.type="a";
+        oElement.start=nStart;
+        setLeftMargin1(oElement);
+        }
+    if(bBox4)
+        {
+        if(oElement.tagName=="UL")obj.doCmd("InsertOrderedList");
+        oElement = parent.getSelectedElement(oSel);
+
+        oElement.type="I";
+        oElement.start=nStart;
+        setLeftMargin1(oElement);
+        }
+    if(bBox5)
+        {
+        if(oElement.tagName=="UL")obj.doCmd("InsertOrderedList");
+        oElement = parent.getSelectedElement(oSel);
+
+        oElement.type="i";
+        oElement.start=nStart;
+        setLeftMargin1(oElement);
+        }
+
+    if(bBox6)
+        {
+        if(oElement.tagName=="OL")obj.doCmd("InsertUnOrderedList");
+        oElement = parent.getSelectedElement(oSel);
+
+        oElement.type="disc";
+        setLeftMargin2(oElement);
+        }
+    if(bBox7)
+        {
+        if(oElement.tagName=="OL")obj.doCmd("InsertUnOrderedList");
+        oElement = parent.getSelectedElement(oSel);
+
+        oElement.type="circle";
+        setLeftMargin2(oElement);
+        }
+    if(bBox8)
+        {
+        if(oElement.tagName=="OL")obj.doCmd("InsertUnOrderedList");
+        oElement = parent.getSelectedElement(oSel);
+
+        oElement.type="square";
+        setLeftMargin2(oElement);
+        }
+    realTime();
+    }
+
+function doClick1(oEl)
+    {
+    var inpImgURL = document.getElementById("inpImgURL");
+
+    var box1 = document.getElementById("box1");
+    var box2 = document.getElementById("box2");
+    var box3 = document.getElementById("box3");
+    var box4 = document.getElementById("box4");
+    var box5 = document.getElementById("box5");
+    var box6 = document.getElementById("box6");
+    var box7 = document.getElementById("box7");
+    var box8 = document.getElementById("box8");
+
+    box1.style.border='white 2px solid';
+    box1.setAttribute("selThis", "");
+    box2.style.border='white 2px solid';
+    box2.setAttribute("selThis", "");
+    box3.style.border='white 2px solid';
+    box3.setAttribute("selThis", "");
+    box4.style.border='white 2px solid';
+    box4.setAttribute("selThis", "");
+    box5.style.border='white 2px solid';
+    box5.setAttribute("selThis", "");
+    box6.style.border='white 2px solid';
+    box6.setAttribute("selThis", "");
+    box7.style.border='white 2px solid';
+    box7.setAttribute("selThis", "");
+    box8.style.border='white 2px solid';
+    box8.setAttribute("selThis", "");
+
+    oEl.style.border='#708090 2px solid';
+    oEl.setAttribute("selThis", "selThis");
+
+    inpImgURL.value="";
+    }
+
+function doMouseOut(oEl)
+    {
+    if(oEl.getAttribute("selThis")=="selThis")
+        {
+        oEl.style.border='#708090 2px solid';
+        }
+    else
+        {
+        oEl.style.border='white 2px solid';
+        }
+    }
+
+function doMouseOver(oEl)
+    {
+    if(oEl.getAttribute("selThis")!="selThis")
+        {
+        oEl.style.border='#e0e0e0 2px solid';
+        }
+
+    }
+
+</script>
+</head>
+<body style="overflow:hidden;">
+
+<table width=100% height=100% align=center cellpadding=0 cellspacing=0>
+<tr>
+<td valign=top style="padding-top:12px;padding-left:10px;padding-right:10px;padding-bottom:0px;height:100%">
+
+    <table cellpadding=0 cellspacing=0>
+    <tr>
+    <td id=tab1 style="cursor:hand;padding:6px;border:#e5e5e5 2px solid;border-bottom:none;background:#e5e5e5" onclick="tabClick(1)" nowrap><b><span id=txtLang name=txtLang>Numbered</span></b></td>
+    <td id=tab2 style="cursor:hand;padding:6px;border:#e5e5e5 2px solid;border-left:none;background:#e5e5e5" onclick="tabClick(2)" nowrap><b><span id=txtLang name=txtLang>Bulleted</span></b></td>
+    <td style="border-bottom:#e5e5e5 1px solid;" width=100%>&nbsp;</td>
+    </tr>
+    </table>
+
+
+    <table cellpadding=0 cellspacing=0 style="border:#e5e5e5 1px solid;border-top:none;width:100%;height:195px;background:#ffffff;" id="Table3">
+    <tr>
+    <td style="padding:7px;" valign=top height=100%>
+
+    <!-- NUMBERED -->
+    <div id=divNumbered style="display:block;">
+
+    <table>
+    <tr>
+    <td class="box" style="padding:1px">
+        <table cellpadding="0" cellspacing="0" style="width:75px;">
+        <tr>
+        <td id="box1" style="color:#555555;border:white 2px solid;padding:3px;padding-right:0px"
+            onclick="doClick1(this)"
+            onmouseover="doMouseOver(this)"
+            onmouseout="doMouseOut(this)">
+        <ol style="margin-left:1px;margin-right:6px;margin-top:2px;margin-bottom:2px" type="1">
+        <li>-----</li>
+        <li>-----</li>
+        <li>-----</li>
+        </ol>
+        </td>
+        </tr>
+        </table>
+    </td>
+    <td>&nbsp;</td>
+    <td class="box">
+        <table cellpadding="0" cellspacing="0" style="width:75px;">
+        <tr>
+        <td id="box2" style="color:#555555;border:white 2px solid;padding:3px;padding-right:0px"
+            onclick="doClick1(this)"
+            onmouseover="doMouseOver(this)"
+            onmouseout="doMouseOut(this)">
+        <ol style="margin-left:1px;margin-right:6px;margin-top:2px;margin-bottom:2px" type="A">
+        <li>-----</li>
+        <li>-----</li>
+        <li>-----</li>
+        </ol>
+        </td>
+        </tr>
+        </table>
+    </td>
+    <td>&nbsp;</td>
+    <td class="box">
+        <table cellpadding="0" cellspacing="0" style="width:75px;">
+        <tr>
+        <td id="box3" style="color:#555555;border:white 2px solid;padding:3px;padding-right:0px"
+            onclick="doClick1(this)"
+            onmouseover="doMouseOver(this)"
+            onmouseout="doMouseOut(this)">
+        <ol style="margin-left:1px;margin-right:6px;margin-top:2px;margin-bottom:2px" type="a">
+        <li>-----</li>
+        <li>-----</li>
+        <li>-----</li>
+        </ol>
+        </td>
+        </tr>
+        </table>
+    </td>
+    </tr>
+    <tr>
+    <td class="box">
+        <table cellpadding="0" cellspacing="0" style="width:75px;">
+        <tr>
+        <td id="box4" style="color:#555555;border:white 2px solid;padding:3px;padding-right:0px"
+            onclick="doClick1(this)"
+            onmouseover="doMouseOver(this)"
+            onmouseout="doMouseOut(this)">
+        <ol style="margin-left:1px;margin-right:6px;margin-top:2px;margin-bottom:2px" type="I">
+        <li>-----</li>
+        <li>-----</li>
+        <li>-----</li>
+        </ol>
+        </td>
+        </tr>
+        </table>
+    </td>
+    <td>&nbsp;</td>
+    <td class="box">
+        <table cellpadding="0" cellspacing="0" style="width:75px;">
+        <tr>
+        <td id="box5" style="color:#555555;border:white 2px solid;padding:3px;padding-right:0px"
+            onclick="doClick1(this)"
+            onmouseover="doMouseOver(this)"
+            onmouseout="doMouseOut(this)">
+        <ol style="margin-left:1px;margin-right:6px;margin-top:2px;margin-bottom:2px" type="i">
+        <li>-----</li>
+        <li>-----</li>
+        <li>-----</li>
+        </ol>
+        </td>
+        </tr>
+        </table>
+    </td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    </tr>
+    <tr>
+    <td nowrap colspan="5" style="padding-top:5px">
+        <span id=txtLang name=txtLang style="width:90px">Starting Number</span>: <input class="inpTxt" type="text" name="inpStarting" id="inpStarting" value="1" size="3">
+    </td>
+    </tr>
+    <tr>
+    <td nowrap colspan="5" style="padding-top:5px">
+        <span id=txtLang name=txtLang style="width:90px">Left Margin</span>:
+        <select name="inpLeftMargin1" id="inpLeftMargin1" class="inpSel">
+            <option value=""></option>
+            <option value="1em" selected>1em</option>
+            <option value="2em">2em</option>
+            <option value="3em">3em</option>
+            <option value="4em">4em</option>
+            <option value="5em">5em</option>
+            <option value="6em">6em</option>
+            <option value="7em">7em</option>
+        </select>
+    </td>
+    </tr>
+    </table>
+
+    </div>
+
+    <!-- BULLETED -->
+    <div id="divBulleted" style="display:none;">
+
+    <table>
+    <tr>
+    <td class="box" style="padding:1px">
+        <table cellpadding="0" cellspacing="0" style="width:75px;">
+        <tr>
+        <td id="box6" style="color:#555555;border:white 2px solid;padding:3px;padding-right:0px"
+            onclick="doClick1(this)"
+            onmouseover="doMouseOver(this)"
+            onmouseout="doMouseOut(this)">
+        <ul style="margin-left:1px;margin-right:5px;margin-top:2px;margin-bottom:2px" type="disc">
+        <li>-----</li>
+        <li>-----</li>
+        <li>-----</li>
+        </ul>
+        </td>
+        </tr>
+        </table>
+    </td>
+    <td>&nbsp;</td>
+    <td class="box">
+        <table cellpadding="0" cellspacing="0" style="width:75px;">
+        <tr>
+        <td id="box7" style="color:#555555;border:white 2px solid;padding:3px;padding-right:0px"
+            onclick="doClick1(this)"
+            onmouseover="doMouseOver(this)"
+            onmouseout="doMouseOut(this)">
+        <ul style="margin-left:1px;margin-right:5px;margin-top:2px;margin-bottom:2px" type="circle">
+        <li>-----</li>
+        <li>-----</li>
+        <li>-----</li>
+        </ul>
+        </td>
+        </tr>
+        </table>
+    </td>
+    <td>&nbsp;</td>
+    <td class="box">
+        <table cellpadding="0" cellspacing="0" style="width:75px;">
+        <tr>
+        <td id="box8" style="color:#555555;border:white 2px solid;padding:3px;padding-right:0px"
+            onclick="doClick1(this)"
+            onmouseover="doMouseOver(this)"
+            onmouseout="doMouseOut(this)">
+        <ul style="margin-left:1px;margin-right:5px;margin-top:2px;margin-bottom:2px" type="square">
+        <li>-----</li>
+        <li>-----</li>
+        <li>-----</li>
+        </ul>
+        </td>
+        </tr>
+        </table>
+    </td>
+    </tr>
+    <!--
+    <tr>
+    <td colspan="5" style="padding-top:5px;height:86px">&nbsp;
+    </td>
+    </tr>
+    -->
+    <tr>
+    <td colspan="5" style="padding-top:5px;height:57px">&nbsp;
+    </td>
+    </tr>
+    <tr>
+    <td colspan="5" style="padding-top:5px">
+        <table cellpadding="0" cellspacing="0" style="width:100%" id="Table1">
+        <tr>
+        <td nowrap><span id=txtLang name=txtLang style="width:90px">Using Image - url</span>:</td>
+        <td style="width:100%;padding-left:3px">
+          <input type="text" id="inpImgURL" name=inpImgURL style="width:100%" class="inpTxt" >
+        </td>
+        <td>
+          <input type="button" value="" onclick="openAsset()" id="btnAsset" name="btnAsset" style="display:none;background:url('openAsset.gif');width:20px;height:16px;border:#a5acb2 1px solid;margin-left:1px;">
+        </td>
+        </tr>
+        </table>
+    </td>
+    </tr>
+
+    <tr>
+    <td colspan="5" style="padding-top:5px">
+        <span nowrap id=txtLang name=txtLang style="width:90px">Left Margin</span>:
+        <select name="inpLeftMargin2" id="inpLeftMargin2" class="inpSel">
+            <option value=""></option>
+            <option value="1em" selected>1em</option>
+            <option value="2em">2em</option>
+            <option value="3em">3em</option>
+            <option value="4em">4em</option>
+            <option value="5em">5em</option>
+            <option value="6em">6em</option>
+            <option value="7em">7em</option>
+        </select>
+    </td>
+    </tr>
+    </table>
+
+    </div>
+
+    </td>
+    </tr>
+    </table>
+
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" align="right" style="padding-top:10px;">
+  <table cellpadding=0 cellspacing=0>
+  <tr>
+  <td>
+    <input type="button" name=btnCancel id=btnCancel value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+    <input type="button" name=btnApply id=btnApply value="apply" onclick="doApply();window.focus();" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+    <input type="button" name=btnOk id=btnOk value=" ok " onclick="doApply();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  </tr>
+  </table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

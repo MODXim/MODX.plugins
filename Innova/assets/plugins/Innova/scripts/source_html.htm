@@ -1,0 +1,199 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="style/editor.css" rel="stylesheet" type="text/css">
+<link href="style/istoolbar.css" rel="stylesheet" type="text/css">
+
+<script language="javascript" src="istoolbar.js"></script>
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='language/"+sLangDir+"/source_html.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+var activeModalWin;
+
+function doCmd(sCmd,sOption)
+  {
+  var oSel=idSource.document.selection.createRange();
+  var sType=idSource.document.selection.type;
+  var oTarget=(sType=="None"?idSource.document:oSel);
+  oTarget.execCommand(sCmd,false,sOption);
+  }
+function jsReplace(sText, sFind, sReplace)
+  {
+  var arrTmp = sText.split(sFind);
+  if (arrTmp.length > 1) sText = arrTmp.join(sReplace);
+  return sText;
+  }
+var sBodyHeader;
+var sBodyFooter;
+var sBodyTag;
+
+function bodyOnLoad() {
+  setupToolbar();loadTxt();initSourceEditor()
+}
+
+function initSourceEditor()
+  {
+  var oEditor=parent.oUtil.oEditor;
+  var obj = parent.oUtil.obj;
+
+  //Save sBodyHeader, sBodyFooter, sBodyTag
+  var s=oEditor.document.documentElement.outerHTML;
+  var arrTmp=s.split("<BODY");
+  sBodyHeader=arrTmp[0];
+  s=arrTmp[1];
+  arrTmp=s.split("</BODY>");
+  sBodyFooter=arrTmp[1];
+  s=oEditor.document.documentElement.outerHTML;
+  s=s.substr(s.indexOf("<BODY"));
+  s=s.substr(0,s.indexOf(">")+1);
+  sBodyTag=s;
+
+  var sHTML="";
+  sHTML = oEditor.document.body.innerHTML;
+  sHTML = jsReplace(sHTML," contentEditable=true","");
+
+  sHTML = sHTML.replace(/align=['"]*middle['"]*/gi, "align=\"center\"");
+
+  idSource.document.body.innerText=sHTML;
+  idSource.document.body.style.cssText="overflow-x:scroll;overflow-y:scroll;white-space:nowrap";
+
+  idSource.document.body.contentEditable=true;
+  idSource.document.body.clearAttributes;
+  idSource.document.body.style.marginTop='4';
+  idSource.document.body.style.marginLeft='10';
+  idSource.document.body.style.fontFamily='Tahoma';
+  idSource.document.body.style.fontSize='11px';
+  idSource.document.body.style.color='black';
+  idSource.document.body.style.background='white';
+  idSource.document.body.onkeydown = new Function("doKeyPress(idSource.event)");
+
+  doWrap()
+  }
+function doKeyPress(evt)
+  {
+  if (evt.keyCode==13)
+    {
+    var thisSel = document.selection.createRange();
+    thisSel.pasteHTML('<br>');
+    evt.cancelBubble = true;
+    evt.returnValue = false;
+    thisSel.select();
+    thisSel.moveEnd("character", 1);
+    thisSel.moveStart("character", 1);
+    thisSel.collapse(false);
+    return false;
+    idSource.focus();
+    }
+  if (evt.ctrlKey)
+    {
+    if(evt.keyCode==65)doCmd("SelectAll");
+    }
+  }
+function doUpdate()
+  {
+  parent.oUtil.obj.saveForUndo();
+
+  var obj = parent.oUtil.obj;
+
+  sBodyContent = idSource.document.body.innerText;
+  var sHTML = obj.docType + sBodyHeader + sBodyTag + sBodyContent + "</BODY>" + sBodyFooter;
+  obj.putHTML(sHTML);//tdk menggunakan loadHTML() krn loadHTML() hanya utk first load.
+
+  //*** RUNTIME STYLES ***
+  obj.runtimeBorder(false);
+  obj.runtimeStyles();
+  //***********************
+  }
+
+function doWrap()
+  {
+  if(inpWrap.checked==true)
+    {
+    //Wrap Text
+    idSource.document.body.style.whiteSpace="normal";
+    }
+  else
+    {
+    idSource.document.body.style.whiteSpace="nowrap";
+    }
+  }
+
+//*******************
+function setupToolbar()
+  {
+  var obj = parent.oUtil.obj;
+  var tb=new ISToolbar("srcEdt");
+  tb.onClick=function(id) {tbAction(tb, id);};
+  tb.iconPath=obj.iconPath;
+  tb.btnWidth=obj.iconWidth;
+  tb.btnHeight=obj.iconHeight;
+
+  tb.addButton("btnCut","btnCut.gif",getTxt("Cut"));
+  tb.addButton("btnCopy","btnCopy.gif",getTxt("Copy"));
+  tb.addButton("btnPaste","btnPaste.gif",getTxt("Paste"));
+  tb.addSeparator();
+  tb.addButton("btnUndo","btnUndo.gif",getTxt("Undo"));
+  tb.addButton("btnRedo","btnRedo.gif",getTxt("Redo"));
+  tb.addSeparator();
+  tb.addButton("btnSearch","btnSearch.gif",getTxt("Search"));
+  idToolbar.innerHTML=tb.render();
+  }
+
+function tbAction(tb, id)
+  {
+  switch(id)
+    {
+    case "btnCut": doCmd('Cut'); break;
+    case "btnCopy": doCmd('Copy'); break;
+    case "btnPaste": doCmd('Paste'); break;
+    case "btnUndo": doCmd('Undo'); break;
+    case "btnRedo": doCmd('Redo'); break;
+    case "btnSearch": modelessDialogShow('search2.htm',375,163); break;
+    }
+
+  }
+//*******************
+function modelessDialogShow(url,width,height)
+  {
+    parent.modelessDialogShow(parent.oUtil.scriptPath+url, width,height,window);
+  }
+</script>
+</head>
+<body style="overflow:hidden;margin:0;background: #f4f4f4;">
+
+<table width="100%" height="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td id="idToolbar">
+
+</td>
+</tr>
+<tr>
+<td style="height:100%">
+  <iframe style="width:100%;height:100%;" frameborder="no" src="blank.gif"  name="idSource" id="idSource" contentEditable="true"></iframe>
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" style="padding-top:10px;" align="right" valign="right">
+  <table cellpadding=0 cellspacing=0>
+  <td width="100%">
+    &nbsp;<input type="checkbox" ID="inpWrap" NAME="inpWrap" class="inpChk" onclick="doWrap()" checked> <span id="txtLang" name="txtLang">Wrap Text</span>
+  </td>
+  <td>
+    <input type="button" name="btnCancel" id="btnCancel" value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+    <input type="button" name="btnApply" id="btnApply" value="apply" onclick="doUpdate();initSourceEditor()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+    <input type="button" name="btnOk" id="btnOk" value=" ok " onclick="doUpdate();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  </table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,115 @@
+.dynamic-tab-pane-control .tab-row .tab.selected {
+	z-index: 2 !important;
+}
+.ace_composition {
+	box-shadow: none !important;
+	border: 0 !important;
+	background: inherit !important;
+	padding-left: 0 !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	-webkit-transition: all 0;
+	-moz-transition: all 0;
+	transition: all 0;
+}
+
+.ace_plugin_drag, .ace_plugin_drag * {
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+}
+.ace_plugin_outer {
+	position: relative;
+	border: 1px solid #ccc;
+	border-bottom: 0;
+}
+.ace_plugin_inner {
+	width: 100%;
+	height: 100%;
+	background: #fff;
+}
+.ace_plugin_toolbar {
+	height: 29px;
+	line-height: 29px;
+	background: #f8f8f8;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+	border:1px solid #ccc;
+	border-bottom: 0;
+}
+.ace_plugin_toolbar span, .ace_plugin_toolbar label {
+	font-size:9pt;
+	font-weight: bold;
+	display: inline-block;
+	padding: 0 4px 0 8px;
+}
+.ace_plugin_knob {
+	position: relative;
+	height: 10px;
+	padding: 3px 0;
+	background: #eee;
+	cursor: move;
+	overflow: hidden;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select:none;
+	z-index: 100;
+	border: 1px solid #ccc;
+}
+.ace_plugin_knob:before, .ace_plugin_knob:after {
+	content: "";
+	display: block;
+	height: 1px;
+	width: 12px;
+	margin: 1px auto;
+	border-top:1px solid #aaa;
+	border-bottom:1px solid #aaa;
+}
+.ace_plugin_knob:hover, .ace_plugin_drag .ace_plugin_knob {
+	background: #ddd;
+}
+.ace_plugin_fullscreen .ace_plugin_knob {
+	display: none;
+}
+
+.ace_plugin_fullscreen {
+	background: #f8f8f8;
+	position: fixed;
+	border-left:1px solid #ccc;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	z-index: 1000;
+}
+.ace_plugin_fullscreen .ace_plugin_outer {
+	position: fixed;
+	border: 0;
+	top:30px;
+	left: 0;
+	right:0;
+	bottom: 0;
+	height: auto !important;
+	border-left:1px solid #ccc;
+}
+.ace_plugin_fullscreen .ace_plugin_toolbar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right:0;
+	border:0;
+	border-bottom:1px solid #ccc;
+	border-left:1px solid #ccc;
+}
+
+.sectionBody > div > .ace_plugin_container > div {
+	border-left: 0;
+	border-right: 0;
+}
+.sectionBody > div > .ace_plugin_container > div:first-child {
+	border-top:0;
+}
+.sectionBody > div > .ace_plugin_container > div:last-child {
+	border-bottom:0;
+}

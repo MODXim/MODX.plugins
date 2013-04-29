@@ -1,0 +1,369 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='language/"+sLangDir+"/media.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+
+function GetElement(oElement,sMatchTag)
+  {
+  while (oElement!=null&&oElement.tagName!=sMatchTag)
+    {
+    if(oElement.tagName=="BODY")return null;
+    oElement=oElement.parentElement;
+    }
+  return oElement;
+  }
+
+function doWindowFocus()
+  {
+  parent.oUtil.onSelectionChanged=new Function("realTime()");
+  }
+function bodyOnLoad()
+  {
+
+  loadTxt();
+
+  window.onfocus=doWindowFocus;
+  parent.oUtil.onSelectionChanged=new Function("realTime()");
+
+  if(parent.oUtil.obj.cmdAssetManager!="")btnAsset.style.display="block";
+  if(parent.oUtil.obj.cmdMediaManager!="")btnAsset.style.display="block";
+
+  realTime()
+  }
+
+function bodyOnUnload() {
+  parent.oUtil.onSelectionChanged=null;
+}
+
+function openAsset()
+  {
+  if(parent.oUtil.obj.cmdAssetManager!="")
+    eval(parent.oUtil.obj.cmdAssetManager);
+  if(parent.oUtil.obj.cmdMediaManager!="")
+    eval(parent.oUtil.obj.cmdMediaManager);
+  }
+function setAssetValue(v)
+  {
+  document.getElementById("inpURL").value = v;
+  }
+function modalDialogShow(url,width,height)
+  {
+    parent.modalDialogShow(url,width,height, window);
+  }
+function realTime()
+  {
+  parent.oUtil.obj.setFocus();
+  if(!parent.oUtil.obj.checkFocus()){return;}//Focus stuff
+  var oEditor=parent.oUtil.oEditor;
+  var oSel=oEditor.document.selection.createRange();
+  var sType=oEditor.document.selection.type;
+
+  clearAllProperties()
+
+  if (oSel.parentElement) oEl=GetElement(oSel.parentElement(),"OBJECT");
+  else oEl=GetElement(oSel.item(0),"OBJECT");
+
+  if (oEl)
+    {
+
+    inpURL.value=oEl.url;
+    inpWidth.value=oEl.width;
+    inpHeight.value=oEl.height;
+
+    chkAutoRewind.checked = oEl.settings.playCount=="32767";
+    chkShowControls.checked = oEl.uiMode=="full";
+    chkAutoStart.checked = oEl.settings.autoStart==true;
+
+    btnApply.style.display="block";
+    btnOk.style.display="block";
+    btnInsert.style.display="none";
+    }
+  else
+    {
+    btnApply.style.display="none";
+    btnOk.style.display="none";
+    btnInsert.style.display="block";
+    }
+  }
+function clearAllProperties()
+  {
+  inpURL.value="";
+  inpWidth.value="320";
+  inpHeight.value="290";
+  chkAutoStart.checked=true;
+  chkShowControls.checked=true;
+  chkShowStatusBar.checked=false;
+  chkShowDisplay.checked=false;
+  chkAutoRewind.checked=true;
+  }
+
+function insertMedia()
+  {
+  parent.oUtil.obj.setFocus();
+  if(!parent.oUtil.obj.checkFocus()){return;}//Focus stuff
+  var oEditor=parent.oUtil.oEditor;
+
+  parent.oUtil.obj.saveForUndo();
+
+  if(chkAutoStart.checked)sAutoStart="true";
+  else sAutoStart="false";
+
+  if(chkShowControls.checked)sShowControls="true";
+  else sShowControls="false";
+
+  if(chkShowStatusBar.checked)sShowStatusBar="true";
+  else sShowStatusBar="false";
+
+  if(chkShowDisplay.checked)sShowDisplay="true";
+  else sShowDisplay="false";
+
+  if(chkAutoRewind.checked)sAutoRewind="true";
+  else sAutoRewind="false";
+
+
+  var sHTML = "<object selThis=\"selThis\" width='"+inpWidth.value+"' height='"+inpHeight.value+"' "+
+    "classid='CLSID:6BF52A52-394A-11D3-B153-00C04F79FAA6' "+
+    "codebase='../../../www.microsoft.com/Windows/Downloads/Contents/MediaPlayer/' >"+
+    "<param name='URL' value='"+inpURL.value+"'>"+
+    "<param name='autoStart' value='"+sAutoStart+"'>"+
+    "<param name='uiMode' value='"+(sShowControls=="true"?"full":"none")+"'>"+
+    "<param name='playCount' value='"+(sAutoRewind=="true"?32767:1)+"'>"+
+    " <embed "+
+    " type='application/x-mplayer2' "+
+    " pluginspage='../../../www.microsoft.com/Windows/Downloads/Contents/MediaPlayer/' "+
+    " width='"+inpWidth.value+"' "+
+    " height='"+inpHeight.value+"' "+
+    " src='"+inpURL.value+"' "+
+    " filename='"+inpURL.value+"' "+
+    " autostart='"+(sAutoStart=="true"?"1":"0")+"' "+
+    " showcontrols='"+(sShowControls=="true"?"1":"0")+"' "+
+    " showstatusbar='"+"0"+"' "+
+    " showdisplay='"+"0"+"' "+
+    " autorewind='"+(sAutoRewind=="true"?"1":"0")+"'>"+
+    " </embed>"+
+    "</object>";
+
+
+  /*
+  var sHTML = "<embed selThis=\"selThis\" "+
+    "type='application/x-mplayer2' "+
+    "pluginspage='../../../www.microsoft.com/Windows/Downloads/Contents/MediaPlayer/' "+
+    "width='"+inpWidth.value+"' "+
+    "height='"+inpHeight.value+"' "+
+    "src='"+inpURL.value+"' "+
+    "filename='"+inpURL.value+"' "+
+    "autostart='"+sAutoStart+"' "+
+    "showcontrols='"+sShowControls+"' "+
+    "showstatusbar='"+sShowStatusBar+"' "+
+    "showdisplay='"+sShowDisplay+"' "+
+    "autorewind='"+sAutoRewind+"'></embed>"
+  */
+
+  var obj=parent.oUtil.obj;
+  obj.insertHTML(sHTML);
+
+  for(var i=0;i<oEditor.document.all.length;i++)
+    {
+    if(oEditor.document.all[i].getAttribute("selThis")=="selThis")
+      {
+      oEditor.document.all[i].removeAttribute("selThis",0);
+      var oSelRange = oEditor.document.body.createControlRange()
+      oSelRange.add(oEditor.document.all[i]);
+      oSelRange.select();
+      }
+    }
+
+  realTime();
+
+  parent.realTime(parent.oUtil.oName);
+  parent.oUtil.obj.selectElement(0);
+  parent.oUtil.obj.bookmarkSelection();
+  }
+function updateMedia()
+  {
+  parent.oUtil.obj.setFocus();
+  if(!parent.oUtil.obj.checkFocus()){return;}//Focus stuff
+  var oEditor=parent.oUtil.oEditor;
+  var oSel=oEditor.document.selection.createRange();
+  var sType=oEditor.document.selection.type;
+
+  parent.oUtil.obj.saveForUndo();
+
+  if (oSel.parentElement) oEl=GetElement(oSel.parentElement(),"OBJECT");
+  else oEl=GetElement(oSel.item(0),"OBJECT");
+
+  if (oEl)
+    {
+
+    if(chkAutoStart.checked)sAutoStart="true";
+    else sAutoStart="false";
+
+    if(chkShowControls.checked)sShowControls="true";
+    else sShowControls="false";
+
+    if(chkShowStatusBar.checked)sShowStatusBar="true";
+    else sShowStatusBar="false";
+
+    if(chkShowDisplay.checked)sShowDisplay="true";
+    else sShowDisplay="false";
+
+    if(chkAutoRewind.checked)sAutoRewind="true";
+    else sAutoRewind="false";
+
+    var sHTML = "<object selThis=\"selThis\" width='"+inpWidth.value+"' height='"+inpHeight.value+"' "+
+    "classid='CLSID:6BF52A52-394A-11D3-B153-00C04F79FAA6' "+
+    "codebase='../../../www.microsoft.com/Windows/Downloads/Contents/MediaPlayer/' >"+
+    "<param name='URL' value='"+inpURL.value+"'>"+
+    "<param name='autoStart' value='"+sAutoStart+"'>"+
+    "<param name='uiMode' value='"+(sShowControls=="true"?"full":"none")+"'>"+
+    "<param name='playCount' value='"+(sAutoRewind=="true"?32767:1)+"'>"+
+    " <embed "+
+    " type='application/x-mplayer2' "+
+    " pluginspage='../../../www.microsoft.com/Windows/Downloads/Contents/MediaPlayer/' "+
+    " width='"+inpWidth.value+"' "+
+    " height='"+inpHeight.value+"' "+
+    " src='"+inpURL.value+"' "+
+    " filename='"+inpURL.value+"' "+
+    " autostart='"+(sAutoStart=="true"?"1":"0")+"' "+
+    " showcontrols='"+(sShowControls=="true"?"1":"0")+"' "+
+    " showstatusbar='"+"0"+"' "+
+    " showdisplay='"+"0"+"' "+
+    " autorewind='"+(sAutoRewind=="true"?"1":"0")+"'>"+
+    " </embed>"+
+    "</object>";
+
+    oEl.outerHTML = sHTML;
+
+    for(var i=0;i<oEditor.document.all.length;i++)
+      {
+      if(oEditor.document.all[i].getAttribute("selThis")=="selThis")
+        {
+        oEditor.document.all[i].removeAttribute("selThis",0);
+        var oSelRange = oEditor.document.body.createControlRange()
+        oSelRange.add(oEditor.document.all[i]);
+        oSelRange.select();
+        }
+      }
+    }
+  realTime();
+  parent.oUtil.obj.bookmarkSelection();
+  }
+
+  function windowClose() {
+    parent.oUtil.onSelectionChanged=null;
+    self.close();
+  };
+
+</script>
+</head>
+<body style="overflow:hidden;">
+
+<table width=100% height=100% align=center cellpadding=0 cellspacing=0>
+<tr>
+<td valign=top style="padding:5;height:100%">
+
+  <table cellpadding=2 cellspacing=0  style="width:100%">
+  <tr>
+    <td nowrap><span id="txtLang" name="txtLang">Source</span>:&nbsp;&nbsp;</td>
+    <td colspan="4" style="width:100%">
+      <table cellpadding="0" cellspacing="0" style="width:100%">
+      <tr>
+      <td style="width:100%"><input type="text" name=inpURL size=45 value="" style="width:100%" class="inpTxt"></td>
+      <td><input type="button" value="" onclick="openAsset()" id="btnAsset" name="btnAsset" style="display:none;background:url('openAsset.gif');width:23px;height:18px;border:#a5acb2 1px solid;margin-left:1px;"></td>
+      </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td nowrap><span id="txtLang" name="txtLang">Width</span>:</td>
+    <td colspan="4"><input type="text" name="inpWidth" value=320 size=4 class="inpTxt"></td>
+  </tr>
+  <tr>
+    <td nowrap><span id="txtLang" name="txtLang">Height</span>:</td>
+    <td colspan="4"><input type="text" name="inpHeight" value=290 size=4 class="inpTxt"></td>
+  </tr>
+  <!--
+  <tr>
+    <td colspan="5"><hr>
+    </td>
+  </tr>
+  <tr>
+    <td><span id="txtLang" name="txtLang">Class ID</span>:&nbsp;&nbsp;</td>
+    <td colspan="4">
+      <select name="inpCLassID">
+      <option value="CLSID:22d6f312-b0f6-11d0-94ab-0080c74c7e95" selected>CLSID:22d6f312-b0f6-11d0-94ab-0080c74c7e95</option>
+      <option value="CLSID:6BF52A52-394A-11D3-B153-00C04F79FAA6">CLSID:6BF52A52-394A-11D3-B153-00C04F79FAA6</option>
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="5" height="7px">
+    </td>
+  </tr>-->
+  <tr>
+    <td nowrap><span id="txtLang" name="txtLang">Auto Start</span>:</td>
+    <td>
+    <input type="checkbox" name="chkAutoStart" class="inpChk" checked>
+    </td>
+    <td colspan="3" rowspan="5">
+      &nbsp;
+    </td>
+  </tr>
+  <tr>
+    <td nowrap><span id="txtLang" name="txtLang">Show Controls</span>:</td>
+    <td nowrap>
+    <input type="checkbox" name="chkShowControls" class="inpChk" checked>
+    </td>
+  </tr>
+  <tr style='display:none'>
+    <td nowrap><span id="txtLang" name="txtLang">Show Status Bar</span>:</td>
+    <td nowrap>
+    <input type="checkbox" name="chkShowStatusBar" class="inpChk">
+    </td>
+  </tr>
+  <tr  style='display:none'>
+    <td nowrap><span id="txtLang" name="txtLang">Show Display</span>:</td>
+    <td nowrap>
+    <input type="checkbox" name="chkShowDisplay" class="inpChk">
+    </td>
+  </tr>
+  <tr>
+    <td nowrap><span id="txtLang" name="txtLang">Auto Rewind</span>:</td>
+    <td nowrap>
+    <input type="checkbox" name="chkAutoRewind" class="inpChk" checked>
+    </td>
+  </tr>
+  </table>
+
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" align="right">
+  <table cellpadding=0 cellspacing=0>
+  <tr>
+  <td>
+  <input type="button" name=btnCancel id=btnCancel value="cancel" onclick="windowClose()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+  <input type="button" name=btnInsert id=btnInsert value="insert" onclick="insertMedia();windowClose()" style="display:block" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+  <input type="button" name=btnApply id=btnApply value="apply" onclick="updateMedia()" style="display:none" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+  <input type="button" name=btnOk id=btnOk value=" ok " onclick="updateMedia();windowClose()" style="display:none;" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  </tr>
+  </table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

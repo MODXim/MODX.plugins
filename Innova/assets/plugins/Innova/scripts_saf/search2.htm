@@ -1,0 +1,175 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/search.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+
+var oEditor = null;
+
+function bodyOnLoad()
+  {
+  oEditor = openerWin.document.getElementById("idSource").contentWindow;
+  document.getElementById("inpSearch").focus();
+  }
+
+function doSearch()
+  {
+  var chkCase = document.getElementById("chkMatchCase").checked;
+  var chkWord = document.getElementById("chkMatchWord").checked;
+  var word = document.getElementById("inpSearch").value;
+
+  var oSel = oEditor.getSelection();
+  oSel.collapseToEnd();
+
+  if(oEditor.find(word,chkCase,false, true, chkWord, false, false)) {
+    //do nothing
+  }
+  else
+    {
+    if(confirm(getTxt("Finished searching")))
+      {
+      oSel.collapse(oEditor.document.body, 0);
+      doSearch();
+      }
+    }
+  }
+
+function doReplace()
+  {
+  var oSel=oEditor.getSelection();
+  var range = oSel.getRangeAt(0);
+
+  var word = document.getElementById("inpSearch").value;
+  var repWord = document.getElementById("inpReplace").value;
+
+  if(range.toString().toLowerCase()==word.toLowerCase())
+    {
+    var repWordObj = oEditor.document.createTextNode(repWord);
+    range.deleteContents();
+    range.insertNode(repWordObj);
+    var newRange=oEditor.document.createRange();
+    newRange.selectNodeContents(repWordObj);
+    oSel.removeAllRanges();
+    oSel.addRange(newRange);
+    newRange.collapse(false);
+
+    doSearch();
+    }
+  else
+    {
+    doSearch();
+    }
+  }
+
+function doReplaceAll()
+  {
+  var nReplaced=0;
+
+  var oSel=oEditor.getSelection();
+  var range;
+
+  var chkCase = document.getElementById("chkMatchCase").checked;
+  var chkWord = document.getElementById("chkMatchWord").checked;
+  var word = document.getElementById("inpSearch").value;
+  var repWord = document.getElementById("inpReplace").value;
+
+  var newRange=oEditor.document.createRange();
+  newRange.selectNode(oEditor.document.body);
+  newRange.collapse(true);
+  oSel.removeAllRanges();
+  oSel.addRange(newRange);
+
+  while (true)
+    {
+    if(oEditor.find(word,chkCase,false, true, chkWord, false, false))
+      {
+      var repWordObj = oEditor.document.createTextNode(repWord);
+      range=oEditor.getSelection().getRangeAt(0);
+      range.deleteContents();
+      range.insertNode(repWordObj);
+      newRange=oEditor.document.createRange();
+      newRange.selectNodeContents(repWordObj);
+      oSel.removeAllRanges();
+      oSel.addRange(newRange);
+      newRange.collapse(false);
+      nReplaced++;
+      }
+    else
+      {
+      alert(nReplaced+" occurrence(s) replaced.");
+      nReplaced=0;
+      return;
+      }
+    }
+  }
+
+function doKeyUp()
+  {
+  if(document.getElementById("inpSearch").value=="")
+    {
+    document.getElementById("btnSearch").disabled=true;
+    document.getElementById("btnReplace").disabled=true;
+    document.getElementById("btnReplaceAll").disabled=true;
+    }
+  else
+    {
+    document.getElementById("btnSearch").disabled=false;
+    document.getElementById("btnReplace").disabled=false;
+    document.getElementById("btnReplaceAll").disabled=false;
+    }
+  }
+
+</script>
+</head>
+<body onload="loadTxt();bodyOnLoad()" style="overflow:hidden;">
+
+<table width=100% height=100% align=center cellpadding=0 cellspacing=0>
+<tr>
+<td valign=top style="padding:5;height:100%">
+  <table width=100%>
+  <tr>
+    <td nowrap><span id="txtLang" name="txtLang">Search</span>:</td>
+    <td width="100%">
+      <INPUT type="text" name="inpSearch" id="inpSearch" onkeyup="doKeyUp()" style="width:100%" class="inpTxt">
+    </td>
+    <td>
+      <input type=button name=btnSearch id=btnSearch disabled value="search next" onclick="doSearch()" style="width:90px" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+  </tr>
+  <tr>
+    <td nowrap><span id="txtLang" name="txtLang">Replace</span>:</td>
+    <td width="100%">
+      <input type="text" name="inpReplace" id="inpReplace" style="width:100%" class="inpTxt">
+    </td>
+    <td>
+      <input type=button name=btnReplace id=btnReplace disabled value="replace" onclick="doReplace()" style="width:90px" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+  </tr>
+  <tr>
+    <td nowrap colspan="2">
+    <input type="checkbox" name="chkMatchCase" id="chkMatchCase" class="inpChk"> <span id="txtLang" name="txtLang">Match case</span>&nbsp;&nbsp;
+    <span style="display:none"><input type="checkbox" name="chkMatchWord" id="chkMatchWord" class="inpChk"> <span id="txtLang" name="txtLang">Match whole word</span></span>
+    </td>
+    <td>
+      <input type=button name=btnReplaceAll id=btnReplaceAll disabled value="replace all" onclick="doReplaceAll()" style="width:90px" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+    </td>
+    <td>
+      <input type=button name=btnClose id=btnClose value="close" onclick="self.close()" style="width:90px" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+  </tr>
+  </table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,182 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/form_check.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+function GetElement(oElement,sMatchTag)
+    {
+    while (oElement!=null&&oElement.tagName!=sMatchTag)
+        {
+        if(oElement.tagName=="BODY")return null;
+        oElement=oElement.parentNode;
+        }
+    return oElement;
+    }
+
+function doWindowFocus()
+    {
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+    }
+
+function bodyOnLoad()
+    {
+
+    loadTxt();
+
+    window.onfocus=doWindowFocus;
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+
+    realTime()
+    }
+
+function bodyOnUnload() {
+  parent.oUtil.onSelectionChanged=null;
+}
+
+function realTime()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+    var oEl = parent.getSelectedElement(oSel);
+    oEl = GetElement(oEl,"INPUT");
+
+    var btnInsert = document.getElementById("btnInsert");
+    var btnApply = document.getElementById("btnApply");
+    var btnOk = document.getElementById("btnOk");
+
+    var inpName = document.getElementById("inpName");
+    var inpValue = document.getElementById("inpValue");
+    var inpState = document.getElementById("inpState");
+
+    if (oEl)
+        {
+        if(oEl.type=="checkbox")
+            {
+            btnInsert.style.display="none";
+            btnApply.style.display="block";
+            btnOk.style.display="block";
+
+            if(oEl.name)inpName.value=oEl.name;
+            if(oEl.value) inpValue.value=oEl.value;
+
+            if(oEl.checked) inpState.value="checked";
+            else inpState.value="unchecked";
+            }
+        }
+    else
+        {
+        btnInsert.style.display="block";
+        btnApply.style.display="none";
+        btnOk.style.display="none";
+
+        inpName.value="checkbox1";
+        inpValue.value="";
+        inpState.value="unchecked";
+        }
+    }
+
+function doApply()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+    var oEl = parent.getSelectedElement(oSel);
+    oEl = GetElement(oEl,"INPUT");
+
+    parent.oUtil.obj.saveForUndo();
+
+    var btnInsert = document.getElementById("btnInsert");
+    var btnApply = document.getElementById("btnApply");
+    var btnOk = document.getElementById("btnOk");
+
+    var inpName = document.getElementById("inpName");
+    var inpValue = document.getElementById("inpValue");
+    var inpState = document.getElementById("inpState");
+
+    if (oEl)
+        {
+        if(oEl.type=="checkbox")
+            {
+            if(inpName.value!="") oEl.name=inpName.value;
+            if(inpValue.value!="") oEl.value=inpValue.value;
+            //if(inpState.value=="checked") oEl.checked=true; else oEl.checked=false;
+            if(inpState.value=="checked") oEl.setAttribute("checked","checked"); else oEl.removeAttribute("checked");
+            }
+        }
+    else
+        {
+        var elm = oEditor.document.createElement("INPUT");
+        elm.type = "checkbox";
+        elm.name = inpName.value;
+        elm.value = inpValue.value;
+        //if(inpState.value=="checked") elm.checked=true; else elm.checked=false;
+        if(inpState.value=="checked") elm.setAttribute("checked", "checked");
+
+        oSel = oEditor.getSelection();
+        range = oSel.getRangeAt(0);
+        range.collapse(true);
+        range.insertNode(elm);
+        range = oEditor.document.createRange();
+        range.selectNodeContents(elm);
+        oSel = oEditor.getSelection();
+        oSel.removeAllRanges();
+        oSel.addRange(range);
+        }
+
+    realTime();
+    parent.realTime(parent.oUtil.obj);
+    parent.oUtil.obj.selectElement(0);
+    window.setTimeout("window.focus()", 10);
+    }
+</script>
+</head>
+<body style="overflow:hidden;">
+
+<table width=100% height=100% align=center cellpadding=0 cellspacing=0>
+<tr>
+<td valign=top style="padding:5;height:100%">
+    <table width=100%>
+    <tr>
+        <td nowrap><span id=txtLang name=txtLang>Name</span>:&nbsp;&nbsp;</td>
+        <td width=100%><INPUT type="text" ID="inpName" NAME="inpName" style="width:100%;padding-left:2" value="checkbox1" class="inpTxt"></td>
+    </tr>
+    <tr>
+        <td nowrap><span id=txtLang name=txtLang>Value</span>:&nbsp;&nbsp;</td>
+        <td><INPUT type="text" ID="inpValue" NAME="inpValue" style="width:100%;padding-left:2" class="inpTxt"></td>
+    </tr>
+    <tr>
+        <td nowrap><span id=txtLang name=txtLang>Default</span>:&nbsp;&nbsp;</td>
+        <td>
+        <select ID="inpState" NAME="inpState" style="width:100%" class="inpSel">
+            <option value="checked" id="optLang" name="optLang">Checked</option>
+            <option value="unchecked" id="optLang" name="optLang" selected>Unchecked</option>
+        </select></td>
+    </tr>
+    </table>
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" align="right">
+    <table cellpadding=0 cellspacing=0>
+    <td>
+    <input type=button name=btnCancel id=btnCancel value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    <td>
+    <input type=button name=btnInsert id=btnInsert value="insert" onclick="doApply();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    <td>
+    <input type=button name=btnApply id=btnApply value="apply" style="display:none" onclick="doApply()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    <td>
+    <input type=button name=btnOk id=btnOk value=" ok " style="display:none;" onclick="doApply();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    </table>
+</td>
+</tr>
+</table>
+</body>
+</html>

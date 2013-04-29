@@ -1,0 +1,170 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/form_form.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+function GetElement(oElement,sMatchTag)
+    {
+    while (oElement!=null&&oElement.tagName!=sMatchTag)
+        {
+        if(oElement.tagName=="BODY")return null;
+        oElement=oElement.parentNode;
+        }
+    return oElement;
+    }
+
+function doWindowFocus()
+    {
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+    }
+
+function bodyOnLoad()
+    {
+    loadTxt();
+
+    window.onfocus=doWindowFocus;
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+
+    realTime()
+    }
+
+function bodyOnUnload() {
+  parent.oUtil.onSelectionChanged=null;
+}
+
+function realTime()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+    var oEl = parent.getSelectedElement(oSel);
+    oEl = GetElement(oEl, "FORM");
+
+    if (oEl)
+        {
+        document.getElementById("btnInsert").style.display="none";
+        document.getElementById("btnApply").style.display="block";
+        document.getElementById("btnOk").style.display="block";
+
+        document.getElementById("inpName").value=oEl.name;
+        document.getElementById("inpMethod").value=oEl.method;
+        document.getElementById("inpAction").value=oEl.action;
+        }
+    else
+        {
+        document.getElementById("btnInsert").style.display="block";
+        document.getElementById("btnApply").style.display="none";
+        document.getElementById("btnOk").style.display="none";
+
+        document.getElementById("inpName").value="form1";
+        document.getElementById("inpMethod").value="post";
+        document.getElementById("inpAction").value="";
+        }
+    }
+
+function doApply()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+
+    parent.oUtil.obj.saveForUndo();
+
+    var oEl = parent.getSelectedElement(oSel);
+    oEl = GetElement(oEl, "FORM");
+
+    var inpName = document.getElementById("inpName");
+    var inpMethod = document.getElementById("inpMethod");
+    var inpAction = document.getElementById("inpAction");
+    if (oEl)
+        {
+
+        oEl.name=(inpName.value==""?oEl.name:inpName.value);
+        oEl.setAttribute("id", inpName.value);
+        oEl.method=inpMethod.value;
+        oEl.action=inpAction.value;
+        }
+    else
+        {
+        sHTML = "<form method=\""+inpMethod.value+"\" action=\""+inpAction.value+"\" name=\""+inpName.value+"\" id=\""+inpName.value+"\" selThis=\"selThis\"><br></form>"
+
+        var range = oSel.getRangeAt(0);
+        range.collapse(true);
+        range.insertNode(range.createContextualFragment(sHTML));
+
+        var allForm = oEditor.document.getElementsByTagName("FORM");
+        for(var i=0;i<allForm.length;i++)
+            {
+            if(allForm[i].getAttribute("selThis")=="selThis")
+                {
+                allForm[i].removeAttribute("selThis");
+
+                range = oEditor.document.createRange();
+                range.selectNode(allForm[i]);
+                oSel = oEditor.getSelection()
+                oSel.removeAllRanges();
+                oSel.addRange(range);
+
+                }
+            }
+        }
+
+    realTime();
+    parent.realTime(parent.oUtil.obj);
+    parent.oUtil.obj.selectElement(0);
+    window.setTimeout("window.focus()", 10);
+    }
+</script>
+</head>
+<body style="overflow:hidden;">
+
+<table width=100% height=100% align=center cellpadding=0 cellspacing=0>
+<tr>
+<td valign=top style="padding:5px;height:100%">
+    <table width=100%>
+    <tr>
+        <td nowrap><span id=txtLang name=txtLang>Name</span>:&nbsp;&nbsp;</td>
+        <td width=100%><INPUT type="text" ID="inpName" NAME="inpName" style="width:100%;padding-left:2" value="form1" class="inpTxt"></td>
+    </tr>
+    <tr>
+        <td nowrap><span id=txtLang name=txtLang>Action</span>:&nbsp;&nbsp;</td>
+        <td><INPUT type="text" ID="inpAction" NAME="inpAction" style="width:100%;padding-left:2" class="inpTxt"></td>
+    </tr>
+    <tr>
+        <td nowrap><span id=txtLang name=txtLang>Method</span>:&nbsp;&nbsp;</td>
+        <td>
+        <select ID="inpMethod" NAME="inpMethod" style="width:100%" class="inpSel">
+            <option value="post">post</option>
+            <option value="get">get</option>
+        </select>
+        </td>
+    </tr>
+    </table>
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" align="right">
+        <table cellpadding=0 cellspacing=0>
+        <tr>
+        <td>
+        <input type=button name=btnCancel id=btnCancel value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+        </td>
+        <td>
+        <input type=button name=btnInsert id=btnInsert value="insert" onclick="doApply();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+        </td>
+        <td>
+        <input type=button name=btnApply id=btnApply value="apply" style="display:none" onclick="doApply()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+        </td>
+        <td>
+        <input type=button name=btnOk id=btnOk value=" ok " style="display:none;" onclick="doApply();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+        </td>
+        </tr>
+        </table>
+</td>
+</tr>
+</table>
+</body>
+</html>

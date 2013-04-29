@@ -1,0 +1,202 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/form_button.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+function GetElement(oElement,sMatchTag)
+    {
+    while (oElement!=null&&oElement.tagName!=sMatchTag)
+        {
+        if(oElement.tagName=="BODY")return null;
+        oElement=oElement.parentNode;
+        }
+    return oElement;
+    }
+
+function doWindowFocus()
+    {
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+    }
+
+function bodyOnLoad()
+    {
+    loadTxt();
+
+    window.onfocus=doWindowFocus;
+    parent.oUtil.onSelectionChanged=new Function("realTime()");
+
+    realTime()
+    }
+
+function bodyOnUnload() {
+  parent.oUtil.onSelectionChanged=null;
+}
+
+function realTime()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+
+    var selEl = parent.getSelectedElement(oSel);
+    oEl = GetElement(selEl, "INPUT");
+
+    var btnInsert = document.getElementById("btnInsert");
+    var btnApply = document.getElementById("btnApply");
+    var btnOk = document.getElementById("btnOk");
+
+    var inpName = document.getElementById("inpName");
+    var inpType = document.getElementById("inpType");
+    var inpValue = document.getElementById("inpValue");
+
+    if (oEl)
+        {
+        if(oEl.type=="button" || oEl.type=="submit" || oEl.type=="reset")
+            {
+            btnInsert.style.display="none";
+            btnApply.style.display="";
+            btnOk.style.display="";
+
+            inpType.value=oEl.type;
+            inpType.disabled=true;
+
+            if(oEl.name)inpName.value=oEl.name;
+            if(oEl.value) inpValue.value=oEl.value;
+            }
+        }
+    else
+        {
+        btnInsert.style.display="block";
+        btnApply.style.display="none";
+        btnOk.style.display="none";
+
+        inpType.disabled=false;
+        inpType.value="button";
+
+        inpName.value="button1";
+        inpValue.value="button";
+        }
+    }
+
+function doApply()
+    {
+    var oEditor=parent.oUtil.oEditor;
+    var oSel=oEditor.getSelection();
+
+    var selEl = parent.getSelectedElement(oSel);
+    oEl = GetElement(selEl, "INPUT");
+
+    var inpName = document.getElementById("inpName");
+    var inpType = document.getElementById("inpType");
+    var inpValue = document.getElementById("inpValue");
+
+    parent.oUtil.obj.saveForUndo();
+
+    if (oEl)
+        {
+        oEl.name=inpName.value;
+        if(inpValue.value!="") oEl.value=inpValue.value;
+        }
+    else
+        {
+
+        var elm = oEditor.document.createElement("INPUT");
+        elm.type = inpType.value;
+        elm.name = inpName.value;
+        elm.value = inpValue.value;
+
+        oSel = oEditor.getSelection();
+        range = oSel.getRangeAt(0);
+        range.collapse(true);
+        range.insertNode(elm);
+        range = oEditor.document.createRange();
+        range.selectNodeContents(elm);
+        oSel = oEditor.getSelection();
+        oSel.removeAllRanges();
+        oSel.addRange(range);
+
+        }
+
+    realTime();
+    parent.realTime(parent.oUtil.obj);
+    parent.oUtil.obj.selectElement(0);
+    window.setTimeout("window.focus()", 10);
+    }
+
+function doChangeType()
+    {
+    var inpName = document.getElementById("inpName");
+    var inpType = document.getElementById("inpType");
+    var inpValue = document.getElementById("inpValue");
+
+    if(inpType.value=="button")
+        {
+        inpName.value="button1"
+        inpValue.value="button"
+        }
+    if(inpType.value=="submit")
+        {
+        inpName.value="submit1"
+        inpValue.value="submit"
+        }
+    if(inpType.value=="reset")
+        {
+        inpName.value="reset1"
+        inpValue.value="reset"
+        }
+    }
+</script>
+</head>
+<body style="overflow:hidden;">
+
+<table width=100% height=100% align=center cellpadding=0 cellspacing=0>
+<tr>
+<td valign=top style="padding:5px;height:100%">
+    <table width=100%>
+    <tr id=idType>
+        <td nowrap><span id=txtLang name=txtLang>Type</span>:&nbsp;&nbsp;</td>
+        <td width=100%>
+            <select name=inpType id=inpType onchange="doChangeType()" style="width:100%" class="inpSel">
+                <option value="button" id="optLang" name="optLang">Button</option>
+                <option value="submit" id="optLang" name="optLang">Submit</option>
+                <option value="reset" id="optLang" name="optLang">Reset</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td nowrap><span id=txtLang name=txtLang>Name</span>:&nbsp;&nbsp;</td>
+        <td><INPUT type="text" ID="inpName" NAME="inpName" style="width:100%;padding-left:2px" value="button1" class="inpTxt"></td>
+    </tr>
+    <tr>
+        <td nowrap><span id=txtLang name=txtLang>Value</span>:&nbsp;&nbsp;</td>
+        <td><INPUT type="text" ID="inpValue" NAME="inpValue" style="width:100%;padding-left:2px" value="button" class="inpTxt"></td>
+    </tr>
+    </table>
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" align="right">
+    <table cellpadding=0 cellspacing=0>
+    <td>
+    <input type=button name=btnCancel id=btnCancel value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    <td>
+    <input type=button name=btnInsert id=btnInsert value="insert" onclick="doApply();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    <td>
+    <input type=button name=btnApply id=btnApply value="apply" style="display:none" onclick="doApply()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    <td>
+    <input type=button name=btnOk id=btnOk value=" ok " style="display:none;" onclick="doApply();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+    </td>
+    </table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

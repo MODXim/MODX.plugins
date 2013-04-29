@@ -1,0 +1,519 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="../scripts/style/editor.css" rel="stylesheet" type="text/css">
+<link href="../style/istoolbar.css" rel="stylesheet" type="text/css">
+
+<script language="javascript" src="../scripts/istoolbar.js"></script>
+<script>
+  var sLangDir=parent.oUtil.langDir;
+  document.write("<scr"+"ipt src='../scripts/language/"+sLangDir+"/source_html.js'></scr"+"ipt>");
+</script>
+<script>writeTitle()</script>
+<script>
+
+var iconOffsetTop = -75;
+
+var sBaseHREF="";
+var sBodyHeader;
+var sBodyFooter;
+var sBodyTag;
+
+function init()
+  {
+  var idSource = document.getElementById("idSource").contentWindow;
+  var doc = idSource.document;
+  doc.open();
+  doc.write("<html><head><head><body></body></html>");
+  doc.close();
+  }
+
+function doCmd(sCmd,sOption)
+  {
+    var idSource = document.getElementById("idSource").contentWindow;
+    idSource.document.execCommand(sCmd, false, sOption);
+  }
+
+function bodyOnLoad()
+  {
+  setupToolbar();loadTxt();init();
+
+  var oEditor=parent.oUtil.oEditor;
+
+  //base handling
+  sHTML=parent.getOuterHTML(oEditor.document.documentElement);
+  var arrTmp=sHTML.match(/<BASE([^>]*)>/ig);
+  if(arrTmp!=null)sBaseHREF=arrTmp[0];
+  var arrBase = oEditor.document.getElementsByTagName("BASE");
+  if (arrBase.length != null) {
+    for(var i=0; i<arrBase.length; i++) {
+      arrBase[i].parentNode.removeChild(arrBase[i]);
+    }
+  }
+  //~~~~~~~~~~~~~
+
+  //Save sBodyHeader, sBodyFooter, sBodyTag
+  var s=parent.getOuterHTML(oEditor.document.documentElement).toLowerCase();
+  var arrTmp=s.split("<body");
+  sBodyHeader=arrTmp[0];
+  s=arrTmp[1];
+  arrTmp=s.split("</body>");
+  sBodyFooter=arrTmp[1];
+  s=parent.getOuterHTML(oEditor.document.documentElement).toLowerCase();
+  s=s.substr(s.indexOf("<body"));
+  s=s.substr(0,s.indexOf(">")+1);
+  sBodyTag=s;
+
+  //XHTML inside BODY tag
+  var sBodyContent=recur(oEditor.document.body,"");
+  //var sBodyContent= oEditor.document.body.innerHTML;
+
+  if(sBodyContent.substr(0,4)=="<br>")sBodyContent=sBodyContent.substr(4);//remove <br> if it is added by lineBreak2()
+
+  sBodyContent = sBodyContent.replace(/<br class="innova" \/>/gi, "");
+  sBodyContent = sBodyContent.replace(/class="Apple-style-span"/gi, "");
+
+  var idSource = document.getElementById("idSource").contentWindow;
+  var sourceDocBody = idSource.document.body;
+
+  //remove all child
+  sourceDocBody.innerHTML = "";
+  sourceDocBody.innerHTML = sBodyContent;
+
+  sourceDocBody.style.cssText="overflow-x:scroll;overflow-y:scroll;white-space:nowrap";
+  sourceDocBody.clearAttributes;
+  sourceDocBody.style.marginTop='4';
+  sourceDocBody.style.marginLeft='10';
+  sourceDocBody.style.fontFamily='Tahoma';
+  sourceDocBody.style.fontSize='11px';
+  sourceDocBody.style.color='black';
+  sourceDocBody.style.background='white';
+  //idSource.document.addEventListener("keydown", new Function("doKeyPress(arguments[0])"), false);
+
+  doWrap()
+
+  idSource.document.designMode="on";
+  idSource.focus();
+  }
+
+function doKeyPress(evt)
+  {
+  /*
+  if (evt.keyCode==13)
+    {
+    var thisSel = document.selection.createRange();
+    thisSel.pasteHTML('<br>');
+    evt.cancelBubble = true;
+    evt.returnValue = false;
+    thisSel.select();
+    thisSel.moveEnd("character", 1);
+    thisSel.moveStart("character", 1);
+    thisSel.collapse(false);
+    return false;
+    idSource.focus();
+    }
+  if (evt.ctrlKey)
+    {
+    if(evt.keyCode==65)doCmd("SelectAll");
+    }
+  */
+  }
+
+function doUpdate()
+  {
+  parent.oUtil.obj.saveForUndo();
+
+  var obj = parent.oUtil.obj;
+
+  var oEditor=parent.oUtil.oEditor;
+
+  var idSource = document.getElementById("idSource").contentWindow;
+  var sHTML = idSource.document.body.textContent;
+  sHTML = sHTML.replace(/>\s+</gi, "><"); //replace space between tag
+  sHTML = sHTML.replace(/\r/gi, ""); //replace space between tag
+  sHTML = sHTML.replace(/(<br>)\s+/gi, "$1"); //replace space between BR and text
+  sHTML = sHTML.replace(/(<br\s*\/>)\s+/gi, "$1"); //replace space between <BR/> and text. spasi antara <br /> menyebebkan content menggeser kekanan saat di apply
+
+  sHTML = sHTML.replace(/\s+/gi, " "); //replace spaces with space
+  sHTML = sHTML.replace(/\u00A0+/gi, " ");
+  oEditor.document.body.innerHTML = obj.docType +  sHTML;
+
+  obj.cleanDeprecated();
+  }
+
+/************************
+  HTML to XHTML (formatted)
+************************/
+function lineBreak2(tag) //[0]<TAG>[1]text[2]</TAG>
+  {
+  arrReturn = ["<br>","",""];
+  if( tag=="A"||tag=="B"||tag=="CITE"||tag=="CODE"||tag=="EM"||
+    tag=="FONT"||tag=="I"||tag=="SMALL"||tag=="STRIKE"||tag=="BIG"||
+    tag=="STRONG"||tag=="SUB"||tag=="SUP"||tag=="U"||tag=="SAMP"||
+    tag=="S"||tag=="VAR"||tag=="BASEFONT"||tag=="KBD"||tag=="TT"||tag=="SPAN"||tag=="IMG")
+    arrReturn=["","",""];
+
+  if( tag=="TEXTAREA"||tag=="TABLE"||tag=="THEAD"||tag=="TBODY"||
+    tag=="TR"||tag=="OL"||tag=="UL"||tag=="DIR"||tag=="MENU"||
+    tag=="FORM"||tag=="SELECT"||tag=="MAP"||tag=="DL"||tag=="HEAD"||
+    tag=="BODY"||tag=="HTML")
+    arrReturn=["<br>","","<br>"];
+
+  if( tag=="STYLE"||tag=="SCRIPT")
+    arrReturn=["<br>","",""];
+
+  if(tag=="BR"||tag=="HR")
+    arrReturn=["","<br>",""];
+
+  return arrReturn;
+  }
+function fixAttr(s)
+  {
+  s = String(s).replace(/&/g, "&amp;amp;");//harus di awal
+  s = String(s).replace(/</g, "&amp;lt;");
+  //s = String(s).replace(/>/g, "&amp;gt;");//tdk apa2
+  s = String(s).replace(/"/g, "&amp;quot;");
+  //s = String(s).replace(/'/g, "&amp;apos;");//tdk apa2
+  return s;
+  }
+function fixVal(s)
+  {
+  s = String(s).replace(/&/g, "&amp;amp;");//harus di awal
+  s = String(s).replace(/</g, "&amp;lt;");
+  var x = escape(s);
+  x = unescape(x.replace(/\%A0/gi, "-*REPL*-"));
+  s = x.replace(/-\*REPL\*-/gi, "&nbsp;");
+
+  return s;
+  }
+function recur(oEl,sTab)
+  {
+  var sHTML="";
+  for(var i=0;i<oEl.childNodes.length;i++)
+    {
+    var oNode=oEl.childNodes[i];
+
+    if(oNode.parentNode!=oEl)continue;
+
+    if(oNode.nodeType==1)//tag
+      {
+      var sTagName = oNode.nodeName;
+
+      if(sTagName=="BR" && oNode.className=="innova") continue;
+      if(sTagName=="LINK" && oNode.id=="tmp_xxinnova") continue;
+
+      var bDoNotProcess=false;
+      if(sTagName.substring(0,1)=="/")
+        {
+        bDoNotProcess=true;//do not process
+        }
+      else
+        {
+        /*** tabs ***/
+        var sT= sTab;
+        sHTML+= lineBreak2(sTagName)[0];
+        if(lineBreak2(sTagName)[0] !="") sHTML+= sT;//If new line, use base Tabs
+        /************/
+        }
+
+      if(bDoNotProcess)
+        {
+        ;//do not process
+        }
+      else if(sTagName=="OBJECT" || sTagName=="EMBED")
+        {
+        s=parent.getOuterHTML(oNode);
+
+        s=s.replace(/\"[^\"]*\"/ig,function(x){
+            x=x.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&apos;").replace(/\s+/ig,"#_#").replace(/&amp;amp;/gi,"&amp;");
+            return x});
+        s=s.replace(/<([^ >]*)/ig,function(x){return x.toLowerCase()})
+        s=s.replace(/ ([^=]+)=([^"' >]+)/ig," $1=\"$2\"");//new
+
+        s=s.replace(/ ([^=]+)=/ig,function(x){return x.toLowerCase()});
+        s=s.replace(/#_#/ig," ");
+
+        s=s.replace(/<param([^>]*)>/ig,"\n<param$1 />").replace(/\/ \/>$/ig," \/>");//no closing tag
+
+        if(sTagName=="EMBED")
+          if(oNode.innerHTML=="")
+            s=s.replace(/>$/ig," \/>").replace(/\/ \/>$/ig,"\/>");//no closing tag
+
+        s=s.replace(/<param name=\"Play\" value=\"0\" \/>/,"<param name=\"Play\" value=\"-1\" \/>")
+
+        //sSelThis="";//selThis
+        //if(oElement==oNode)sSelThis=" selThis='selThis'"
+
+        /*** format ***/ //selThis
+        sHTML+="<span style='color:#555555;background:#f7f7f7'><xmp style='font-family:tahoma;margin-top:0px;margin-bottom:0px;'>"+s+"</xmp></span>";
+
+        /**************/
+        }
+      else if(sTagName=="TITLE")
+        {
+        //s="<title>"+oNode.innerHTML+"</title>";
+
+        /*** format ***/
+        sHTML+="<font color='#0000cc'>&lt;<\/font><font color='#8b4513'>title</font>"+
+          "<font color='#0000cc'>&gt;<\/font>" + oNode.innerHTML +
+          "<font color='#0000cc'>&lt;/</font><font color='#8b4513'>title</font>"+
+          "<font color='#0000cc'>&gt;</font>";
+        /**************/
+        }
+      else
+        {
+        if(sTagName=="AREA")
+          {
+          var sCoords=oNode.coords;
+          var sShape=oNode.shape;
+          }
+
+        var oNode2=oNode.cloneNode(false);
+        s=parent.getOuterHTML(oNode2).replace(/<\/[^>]*>/,"");
+
+        if(sTagName=="STYLE")
+          {
+          var arrTmp=s.match(/<[^>]*>/ig);
+          s=arrTmp[0];
+          }
+
+        s=s.replace(/\"[^\"]*\"/ig,function(x){
+            //x=x.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/'/g, "&apos;").replace(/\s+/ig,"#_#");
+            x=x.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\s+/ig,"#_#");
+            return x});
+        s=s.replace(/<([^ >]*)/ig,function(x){return x.toLowerCase()})
+        s=s.replace(/ ([^=]+)=([^" >]+)/ig," $1=\"$2\"");
+        s=s.replace(/ ([^=]+)=/ig,function(x){return x.toLowerCase()});
+        s=s.replace(/#_#/ig," ");
+
+        //single attribute
+        s=s.replace(/(<hr[^>]*)(noshade="")/ig,"$1noshade=\"noshade\"");
+        s=s.replace(/(<input[^>]*)(checked="")/ig,"$1checked=\"checked\"");
+        s=s.replace(/(<select[^>]*)(multiple="")/ig,"$1multiple=\"multiple\"");
+        s=s.replace(/(<option[^>]*)(selected="")/ig,"$1selected=\"true\"");
+        s=s.replace(/(<input[^>]*)(readonly="")/ig,"$1readonly=\"readonly\"");
+        s=s.replace(/(<input[^>]*)(disabled="")/ig,"$1disabled=\"disabled\"");
+        s=s.replace(/(<td[^>]*)(nowrap="" )/ig,"$1nowrap=\"nowrap\" ");
+        s=s.replace(/(<td[^>]*)(nowrap=""\>)/ig,"$1nowrap=\"nowrap\"\>");
+
+        s=s.replace(/ contenteditable=\"true\"/ig,"");
+
+        if(sTagName=="AREA")
+          {
+          s=s.replace(/ coords=\"0,0,0,0\"/ig," coords=\""+sCoords+"\"");
+          s=s.replace(/ shape=\"RECT\"/ig," shape=\""+sShape+"\"");
+          }
+
+        var bClosingTag=true;
+        if(sTagName=="IMG"||sTagName=="BR"||
+          sTagName=="AREA"||sTagName=="HR"||
+          sTagName=="INPUT"||sTagName=="BASE"||
+          sTagName=="LINK"||sTagName=="META")//no closing tag
+          {
+          s=s.replace(/>$/ig," \/>").replace(/\/ \/>$/ig,"\/>");//no closing tag
+          bClosingTag=false;
+          }
+
+        //sSelThis="";//selThis
+        //if(oElement==oNode)sSelThis=" selThis='selThis'"
+
+        /*** format ***/  //selThis
+        //sA1="<span"+sSelThis+"><font color='#0000cc'>&lt;<\/font><font color='#8b4513'>"
+        sA1="<span><font color='#0000cc'>&lt;<\/font><font color='#8b4513'>"
+        sA2="<\/font>"
+        sA3="<font color='#0000cc'>&gt;<\/font>"
+        sA4="<font color='#0000cc'>../../&gt;_3C/font>"
+        s=s.replace(/<([^ >]*)([^ \/>]*)/ig,sA1+"$1"+sA2+"$2");
+        //s=s.replace(/\/>$/ig,sA4);//if there is no closing tag
+        s=s.replace(/>$/ig,sA3);
+        /**************/
+
+        sHTML+=s;
+        if(!bClosingTag)sHTML+="</span>";//selThis
+
+        /*** tabs ***/
+        if(sTagName!="TEXTAREA")sHTML+= lineBreak2(sTagName)[1];
+        if(sTagName!="TEXTAREA")if(lineBreak2(sTagName)[1] !="") sHTML+= sT;//If new line, use base Tabs
+        /************/
+
+        if(bClosingTag)
+          {
+          /*** CONTENT ***/
+          s=parent.getOuterHTML(oNode);
+          if(sTagName=="SCRIPT")
+            {
+            s = s.replace(/<script([^>]*)>[\n+\s+\t+]*/ig,"<script$1>");//clean spaces
+            s = s.replace(/[\n+\s+\t+]*<\/script>/ig,"<\/script>");//clean spaces
+            s = s.replace(/<script([^>]*)>\/\/<!\[CDATA\[/ig,"");
+            s = s.replace(/\/\/\]\]><\/script>/ig,"");
+            s = s.replace(/<script([^>]*)>/ig,"");
+            s = s.replace(/<\/script>/ig,"");
+            s = s.replace(/^\s+/,'').replace(/\s+$/,'');
+            /*** format ***/
+            sHTML+="<div><span style='color:#828282;'>//&lt;![CDATA[<xmp style='font-family:tahoma;margin-top:0px;margin-bottom:0px;'>"+s+"</xmp>//]]&gt;</span></div>";
+            /**************/
+            }
+          if(sTagName=="STYLE")
+            {
+            s = s.replace(/<style([^>]*)>[\n+\s+\t+]*/ig,"<style$1>");//clean spaces
+            s = s.replace(/[\n+\s+\t+]*<\/style>/ig,"<\/style>");//clean spaces
+            s = s.replace(/<style([^>]*)><!--/ig,"");
+            s = s.replace(/--><\/style>/ig,"");
+            s = s.replace(/<style([^>]*)>/ig,"");
+            s = s.replace(/<\/style>/ig,"");
+            s = s.replace(/^\s+/,"").replace(/\s+$/,"");
+            /*** format ***/
+            sHTML+="<div><span style='color:#828282;'>&lt;!--<xmp style='font-family:tahoma;margin-top:0px;margin-bottom:0px;'>"+s+"</xmp>--&gt;</span></div>";
+            /**************/
+            }
+          if(sTagName=="DIV"||sTagName=="P")
+            {
+            if(oNode.innerHTML==""||oNode.innerHTML=="&nbsp;")
+              {
+              sHTML+="&amp;nbsp;";
+              }
+            else sHTML+=recur(oNode,sT+"&nbsp;&nbsp;");
+            }
+          else
+          if (sTagName == "STYLE" || sTagName=="SCRIPT")
+            {
+            //do nothing
+            }
+          else
+            {
+            sHTML+=recur(oNode,sT+"&nbsp;&nbsp;");
+            }
+
+          /*** tabs ***/
+          if(sTagName!="TEXTAREA")sHTML+= lineBreak2(sTagName)[2];
+          if(sTagName!="TEXTAREA")if(lineBreak2(sTagName)[2] !="") sHTML+= sT;//If new line, use base Tabs
+          /************/
+
+          /*** format ***/ //selThis
+          sHTML+="<font color='#0000cc'>&lt;/</font><font color='#8b4513'>" + sTagName.toLowerCase() + "</font><font color='#0000cc'>&gt;</font></span>";
+          /**************/
+          }
+        }
+      }
+    else if(oNode.nodeType==3)//text
+      {
+      sHTML+= fixVal(oNode.nodeValue);
+      }
+    else if(oNode.nodeType==8)
+      {
+      if(parent.getOuterHTML(oNode).substring(0,2)=="<"+"%")
+        {//server side script
+        sTmp=(parent.getOuterHTML(oNode).substring(2))
+        sTmp=sTmp.substring(0,sTmp.length-2)
+        sTmp=sTmp.replace(/^\s+/,"").replace(/\s+$/,"");
+        sHTML+= "<div><span style='background:yellow'>&lt;%<xmp style='font-family:tahoma;margin-top:0px;margin-bottom:0px;'>"+sTmp+"</xmp>%&gt;</span></div>";
+        }
+      else
+        {//comments
+        sTmp=oNode.nodeValue;
+        sTmp = sTmp.replace(/^\s+/,"").replace(/\s+$/,"");
+        sHTML+= "<div><span style='color:#828282;'>&lt;!--<xmp style='font-family:tahoma;margin-top:0px;margin-bottom:0px;'>"+sTmp+"</xmp>--&gt;</span></div>";
+        }
+      }
+    else
+      {
+      ;//Not Processed
+      }
+
+    }
+  return sHTML;
+  }
+
+function doWrap()
+    {
+    var inpWrap = document.getElementById("inpWrap");
+    if(inpWrap.checked==true)
+        {
+        //Wrap Text
+        idSource.document.body.style.whiteSpace="normal";
+        }
+    else
+        {
+        idSource.document.body.style.whiteSpace="nowrap";
+        }
+    }
+
+//*******************
+function setupToolbar()
+  {
+  var obj = parent.oUtil.obj;
+  var tb=new ISToolbar("srcEdt");
+  tb.onClick=function(id) {tbAction(tb, id);};
+  tb.iconPath="../"+obj.iconPath;
+  tb.btnWidth=obj.iconWidth;
+  tb.btnHeight=obj.iconHeight;
+
+  //tb.addButton("btnCut","btnCut.gif",getTxt("Cut"));
+  //tb.addButton("btnCopy","btnCopy.gif",getTxt("Copy"));
+  //tb.addButton("btnPaste","btnPaste.gif",getTxt("Paste"));
+  //tb.addSeparator();
+  tb.addButton("btnUndo","btnUndo.gif",getTxt("Undo"));
+  tb.addButton("btnRedo","btnRedo.gif",getTxt("Redo"));
+  tb.addSeparator();
+  tb.addButton("btnSearch","btnSearch.gif",getTxt("Search"));
+  document.getElementById("idToolbar").innerHTML=tb.render();
+  }
+
+function tbAction(tb, id)
+  {
+  switch(id)
+    {
+    case "btnCut": doCmd('Cut'); break;
+    case "btnCopy": doCmd('Copy'); break;
+    case "btnPaste": doCmd('Paste'); break;
+    case "btnUndo": doCmd('Undo'); break;
+    case "btnRedo": doCmd('Redo'); break;
+    case "btnSearch": modelessDialogShow('search2.htm',375,163); break;
+    }
+
+  }
+//*******************
+function modelessDialogShow(url,width,height)
+  {
+    parent.modelessDialogShow(parent.oUtil.scriptPath+url, width,height,window);
+  }
+
+</script>
+</head>
+<body style="overflow:hidden;margin:0;background: #f4f4f4;">
+
+<table width="100%" height="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td id="idToolbar">
+
+</td>
+</tr>
+<tr>
+<td style="height:100%">
+  <iframe style="width:100%;height:100%;" frameborder="no" name="idSource" id="idSource"></iframe>
+</td>
+</tr>
+<tr>
+<td class="dialogFooter" style="padding-top:10px;" align="right" valign="right">
+  <table cellpadding=0 cellspacing=0>
+  <tr>
+  <td width="100%">
+    &nbsp;<input type="checkbox" ID="inpWrap" NAME="inpWrap" class="inpChk" onclick="doWrap()" checked> <span id="txtLang" name="txtLang">Wrap Text</span>
+  </td>
+  <td>
+    <input type="button" name="btnCancel" id="btnCancel" value="cancel" onclick="self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+    <input type="button" name="btnApply" id="btnApply" value="apply" onclick="doUpdate();bodyOnLoad()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  <td>
+    <input type="button" name="btnOk" id="btnOk" value=" ok " onclick="doUpdate();self.close()" class="inpBtn" onmouseover="this.className='inpBtnOver';" onmouseout="this.className='inpBtnOut'">
+  </td>
+  </tr>
+  </table>
+</td>
+</tr>
+</table>
+
+</body>
+</html>

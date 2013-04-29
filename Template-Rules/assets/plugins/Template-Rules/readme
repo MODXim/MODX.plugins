@@ -1,0 +1,99 @@
+Description
+-----------
+
+Template Rules is a plugin used to:
+
+1. define the default template when a document is created
+2. control the values for "Uses Template" field
+
+Usage:
+1. Use if you want that the children inside a container be created with your template of choice.
+   Eg: You have a container called "Resources". All the children will be created using your specified default template "Resources Inside".
+2. To limit the values shown in "Uses Template" dropdown.
+   Eg: When a user edits a document inside "Resources" container he can only select between 2 templates: "Resources Inside" and "Resources Inside Extended"
+   
+   
+Important:
+This plugin has no effect on root document/containers
+
+Notes:
+This plugin was previously known as automaticTpl. Point 2 above was added as extra functionality
+
+
+Installation
+------------
+
+I. Extract all files from package and upload "templaterules" folder in the "assets/plugins" folder. If you downloaded the package from git rename folder to "templaterules".
+
+II. Set up TV(Template Variable)
+
+	1. Create a TV templateRules.
+
+	2. Caption: Template Rules
+
+	3. Description: Comma separated list of template ids. Eg:12,13. Specify allowed templates in brakets like 12[14|16|17],13[15].
+
+	4. Input Type: Text
+
+	5. Template Access: Select the templates that use this TV. Make sure the templates are used for containers.
+
+	6. Access Permissions: It's up to you what managers will have access to change this TV. You will need to set up documents groups and permissions
+
+IMPORTANT: Make note of the above TV id. For Evolution 1.0 the id is specified inside ().
+
+III. Set up Plugin
+
+	1. Create plugin with
+
+	Name: Template Rules
+	Description: <strong>0.1</strong> Sets Template Rules for new or existing documents.
+
+	2. Copy paste plugin code from "templaterules.plugin.txt".
+
+	3. Check events:
+
+	OnDocFormPrerender
+	OnDocFormRender
+    
+	4. Copy paste plugin configuration:
+
+	&templateRulesTvID=templateRules TV Id;text;
+
+	5. Click anywhere outside the textbox, this will dynamically generate a new parameter field. Input the ID of the templateRules TV you took note of before.
+
+	5. Save plugin.
+
+	6. Click on "Edit Plugin Execution Order by Event" and make sure "Template Rules" is below    "Inherit Parent Template".
+
+    
+How to use
+----------
+
+1. Default template functionality:
+
+Edit a document that has assigned the templateRules TV.
+In the templateRules enter the id of the template you want the children of the container to be created with.
+Enter coma separated list if you want to control multiple levels of documents
+
+Eg: 12,16,20
+- When you create a document inside the container, the default template will be 12 <- child
+- When you create a document in the above document, the default template will be 16 <- grand child
+- When you create a document in the above document, the default template will be 20 <- grand grand child
+
+
+2. Allowed templates functionality:
+
+If you want to limit the number of templates shown in the "Uses Template" field(when a document is created or a document is edited) modify the templateRules input as:
+
+Eg: 12[13|14|15],16[17|18|19],20[21]
+
+Note that the default id Eg:12 will be automatically added to the list of visible templates.
+
+
+3. Advanced Usage:
+
+Refer to the example above.
+
+If the document using the template id 16 has an templateRules TV with the value of 30 the children of the document using this template will be created using the template id 30 not 20.
+
+The plugin goes up the tree until it finds the first not empty templateRules TV. This way you can have more flexibility for multiple levels of documents

@@ -1,0 +1,8 @@
+form#mutate .gridEditor { margin: 0; padding: 0; border-collapse: collapse }
+form#mutate .gridEditor .griditem { overflow: hidden; white-space: nowrap; zoom: 1 }
+form#mutate .gridEditor .griditem span { display: inline-block; padding-top: 3px; width: 50px }
+form#mutate .gridEditor .griditem input { line-height: 1.1; vertical-align: middle }
+form#mutate .gridEditor td, .gridEditor th { text-align: left }
+form#mutate .gridEditor td.first { background: url('../assets/plugins/multigrid/arrow_updown.png') no-repeat left center }
+form#mutate .gridEditor .first { padding-left: 20px }
+form#mutate .gridEditor .griditem input.gridVal { width: auto; margin: 2px 1px 1px }
