@@ -1,0 +1,48 @@
+<div class="red-hd">Личный кабинет</div>
+<div class="exitblock">
+	<a href="/[+forumfolder+]/account" title="Настройки профиля"><img src="/[+forumfolder+]/[+avatar+]" class="mainava" width="64px" title="[+UserName+]"></a>
+	<div class="maininfo">
+		<a href="/[+forumfolder+]/members/[+UserId+]/" class="mainlogin" title="Профиль пользователя [+UserName+]">[+UserName+]</a>
+		<ul>
+			<li>
+				<a href="/[+forumfolder+]/conversations/">
+					Входящих сообщений: <span class="none">[+countMessage+]<sup>[+newMessage+]</sup></span>
+				</a>
+			</li>
+			<li>
+				<a href="/[+forumfolder+]/account/alerts">
+					Оповещений: <span class="[+classAlert+]">[+countAlert+]</span>
+				</a>
+			</li>
+		</ul> 
+	</div>
+	<div class="clear" ></div>
+	<table class="addinfo"><tr>
+		<td>
+			<ul>
+				<li>
+					<a href="/[+forumfolder+]/search/member?user_id=[+UserId+]">
+						Сообщений: <span class="none">[+countPost+]</span>
+					</a>
+				</li>
+				<li>
+					Симпатий: <span class="none">[+countLike+]</span>
+				</li>
+				<li>
+					<a href="/[+forumfolder+]/members/54/trophies">
+						Баллы: <span class="none">[+countBall+]</span>
+					</a>
+				</li>
+				<li>
+					Комментариев: <span class="none">[+countComment+]</span>
+				</li>
+			</ul> 
+		</td>
+		<td>
+			<form class="formexit" action="/[+forumfolder+]/logout/" method="GET">
+					<input type="submit" value="Выход" />
+			</form>
+		</td>
+	</tr></table>
+	<div class="clear"></div>
+</div>

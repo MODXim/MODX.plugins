@@ -1,0 +1,97 @@
+<div class="red-hd">Авторизация на сайте</div>
+<div class="authblock">
+	<form action="/[+forumfolder+]/login/login" method="POST" id="formreg">
+		<table>
+			<tr>
+				<td>
+					<div class="formunblock" />
+				</td>
+				<td>
+					<span class="inp"><input type="text" name="login" placeholder="e-mail" /></span>
+					<input type="hidden" name="register" value="1"/>
+					<span class="but"><input type="submit" value="Регистрация" /></span>
+				</td>
+			</tr>
+		</table>
+	</form>
+	<form action="/[+forumfolder+]/login/login" method="POST" id="formauth">
+		<table>
+			<tr>
+				<td>
+					<div class="formblock" />
+				</td>
+				<td>
+					<span class="inp"><input type="text" name="login" placeholder="e-mail" /></span>
+					<span class="inp"><input type="password" name="password" placeholder="Пароль" /></span>
+                    <span class="but"><input type="submit" value="Войти" /></span>
+                    <input type="hidden" name="remember" value="1" id="ctrl_remember">
+	  				<input type="hidden" name="cookie_check" value="1">
+	  				<input type="hidden" name="redirect" value="[+back+]">
+	 				<input type="hidden" name="_xfToken" value="">
+				</td>
+			</tr>
+		</table>
+	</form>
+	<ul>
+		<li class="reglink"><span><a href="#">Регистрация на сайте</a></span></li>
+		<li class="authlink"><span><a href="#">Авторизация на сайте</a></span></li>
+		<li><span><a href="/[+forumfolder+]/lost-password/">Восстановление забытого пароля</a></span></li>
+	</ul> 
+	<div class="clear" ></div>
+</div>
+<script>
+$(document).ready(function(){
+//При загрузке прячем форму регистарции
+	if($("#formreg").length){
+		$("#formreg").hide();
+	}
+	if($(".reglink").length){
+		$(".reglink a").click(function(e){
+			var test=checkBlock("formauth","На странице не удалось обнаружить форму регистрации");
+			if(test!=true){
+				alert(test);
+			}else{
+				test=checkBlock("formreg",'На странице не удалось обнаружить форму авторизации');
+				if(test!=true){
+					alert(test);
+				}else{
+					$("#formauth").hide();
+					$("#formreg").show();
+					$(".reglink").hide();
+					$(".authlink").show();
+				}
+			}
+			return false;
+		});
+	}
+	
+	if($(".authlink").length){
+		$(".authlink").hide(); //При загрузке прячем ссылку авторизацию
+		$(".authlink a").click(function(e){
+			var test=checkBlock("formreg","На странице не удалось обнаружить форму авторизации");
+			if(test!=true){
+				alert(test);
+			}else{
+				test=checkBlock("formauth",'На странице не удалось обнаружить форму регистрации');
+				if(test!=true){
+					alert(test);
+				}else{
+					$("#formreg").hide();
+					$("#formauth").show();
+					$(".reglink").show();
+					$(".authlink").hide();
+				}
+			}
+			return false;
+		});
+	}
+	
+	function checkBlock(idblock,msg){
+		if($("#"+idblock).length){
+			return true;
+		}else{
+			return msg;
+		}
+	}
+}); 
+</script>
