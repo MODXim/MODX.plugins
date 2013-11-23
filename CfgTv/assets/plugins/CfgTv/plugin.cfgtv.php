@@ -26,6 +26,7 @@ switch ($e->name ) {
 			if (substr($key,0,2)!='tv') continue;
             $id=substr($key,2,strlen($key));
             $name=$prefix.$TVNAME[$id];
+            $value = $modx->db->escape($value);	
             $settings[$name]=$value;
             $SQL="SELECT * FROM ".$modx->getFullTableName('system_settings')." WHERE `setting_name`='".$name."'";
             $count=$modx->db->getRow($modx->db->query($SQL));
