@@ -16,7 +16,7 @@ switch ($e->name) {
     case "OnWebPagePrerender":{
         if($modx->documentObject['searchable']==1){
             $content = $modx->documentOutput;
-            $content= preg_replace('|\s+|', ' ', $content);
+            $content= preg_replace('|\s+|', ' ', preg_replace('|(\s+)?\n(\s+)?|', '', $content));
             $modx->documentOutput = $content;
         }
         break;
