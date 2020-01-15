@@ -53,7 +53,7 @@ if($modx->Event->name=='OnDocFormSave'){
         	$out['del'][$item['id']]=$item['name'];
         }
 			}
-      if(count($out['del'])>0){
+      if($out['del']>0){
         $modx->db->query("DELETE FROM ".$modx->getFullTableName("site_content_tags")." WHERE doc_id = '".$id."' AND tag_id IN (".implode(",",array_keys($out['del'])).") AND tv_id = '".$tv."'");
         $modx->db->query("DELETE t FROM ".$modx->getFullTableName("tags")." as t LEFT JOIN ".$modx->getFullTableName("site_content_tags")." as ct ON ct.tag_id=t.id WHERE t.id IN (".implode(",",array_keys($out['del'])).") AND ct.doc_id IS NULL");  
 			}
